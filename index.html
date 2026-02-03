@@ -867,9 +867,10 @@
                 if (pattern.status === 'active') {
                     if (!pattern.cancellationSet.includes(number)) {
                         pattern.confirmationCount++;
-                        console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/3`);
+                        console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/5`);
                         
-                        if (pattern.confirmationCount >= 3) {
+                        // ALTERAÇÃO AQUI: de 3 para 5
+                        if (pattern.confirmationCount >= 5) {
                             pattern.status = 'confirmed';
                             pattern.confirmedAt = numbersHistory.length;
                             pattern.checkedNumbers = 0;
@@ -1234,6 +1235,7 @@
                     const patternCard = document.createElement('div');
                     patternCard.className = 'pattern-card';
                     
+                    // ALTERAÇÃO AQUI: de 3 para 5
                     patternCard.innerHTML = `
                         <div class="pattern-header">
                             <div class="pattern-title">${pattern.name}</div>
@@ -1241,7 +1243,7 @@
                         </div>
                         <div class="pattern-details">Gatilho: ${pattern.trigger}</div>
                         <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                        <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/3</div>
+                        <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/5</div>
                     `;
                     
                     activePatternsList.appendChild(patternCard);
