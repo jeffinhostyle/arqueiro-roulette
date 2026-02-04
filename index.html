@@ -1,4 +1,18 @@
-<!DOCTYPE html>
+<!-- VERIFICAÇÃO DE ACESSO -->
+<script src="config.js"></script>
+<script>
+// Verificar acesso
+const emailSalvo = localStorage.getItem('arqueiro_acesso_autorizado');
+
+// Se não tem email salvo OU email não está na lista
+if (!emailSalvo || !CONFIG_ARQUEIRO.emailsAutorizados.includes(emailSalvo)) {
+    // Redirecionar para página de acesso
+    window.location.href = "acesso.html";
+}
+
+// Se passar aqui, está autorizado → CONTINUA SEU SISTEMA NORMAL
+console.log("✅ Usuário autorizado:", emailSalvo);
+</script><!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
