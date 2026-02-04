@@ -5,7 +5,7 @@ const CONFIG_ARQUEIRO = {
     // SUA LISTA DE EMAILS AUTORIZADOS
     // Adicione ou remova emails aqui
     emailsAutorizados: [
-        "seuemail@gmail.com",      // SEU EMAIL
+        "jeffinho.oliveira94@gmail.com",      // SEU EMAIL
         "cliente1@hotmail.com",    // CLIENTE 1
         "cliente2@yahoo.com.br",   // CLIENTE 2
         "amigo@gmail.com"          // CLIENTE 3
