@@ -1,18 +1,4 @@
-<!-- VERIFICAÇÃO DE ACESSO -->
-<script src="config.js"></script>
-<script>
-// Verificar acesso
-const emailSalvo = localStorage.getItem('arqueiro_acesso_autorizado');
-
-// Se não tem email salvo OU email não está na lista
-if (!emailSalvo || !CONFIG_ARQUEIRO.emailsAutorizados.includes(emailSalvo)) {
-    // Redirecionar para página de acesso
-    window.location.href = "acesso.html";
-}
-
-// Se passar aqui, está autorizado → CONTINUA SEU SISTEMA NORMAL
-console.log("✅ Usuário autorizado:", emailSalvo);
-</script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -22,6 +8,84 @@ console.log("✅ Usuário autorizado:", emailSalvo);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* ========== ESTILO DO SISTEMA DE ACESSO ========== */
+        .access-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0A0A0A, #1A1A1A);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .access-box {
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid #D4AF37;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .access-title {
+            color: #D4AF37;
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .access-input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: #0A0A0A;
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .access-btn {
+            background: linear-gradient(135deg, #D4AF37, #B8860B);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .access-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .access-success {
+            background: rgba(46, 139, 87, 0.2);
+            border: 1px solid #2E8B57;
+            color: #90EE90;
+        }
+        
+        .access-error {
+            background: rgba(220, 20, 60, 0.2);
+            border: 1px solid #DC143C;
+            color: #FF7F7F;
+        }
+        
+        /* ========== SEU CSS ORIGINAL (TUDO ABAIXO É SEU) ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F4E4A6;
@@ -595,221 +659,327 @@ console.log("✅ Usuário autorizado:", emailSalvo);
     </style>
 </head>
 <body>
-    <header class="main-header">
-        <div class="brand">
-            <h1>ARQUEIRO</h1>
-            <h2>ROULETTE</h2>
-        </div>
-        
-        <div class="warning">⚠️ JOGUE COM RESPONSABILIDADE</div>
-        
-        <div class="cta-message">
-            <strong>Gostou? Chame o Arqueiro e aprenda essas e todas as outras análises especiais que ele guarda a 7 chaves!</strong>
-        </div>
-    </header>
-
-    <div class="container">
-        <div>
-            <div class="panel">
-                <div class="panel-title">
-                    <i>🎯</i> Entrada de Números
-                </div>
-                
-                <div class="input-section">
-                    <div class="input-group">
-                        <div class="number-input">
-                            <input type="number" id="numberInput" min="0" max="36" placeholder="Digite um número (0-36)">
-                        </div>
-                        <button class="btn btn-primary" id="addNumberBtn">
-                            <span>➕</span> Adicionar Número
-                        </button>
-                        <button class="btn btn-secondary" id="randomBtn">
-                            <span>🎲</span> Aleatório
-                        </button>
-                    </div>
-                    
-                    <div class="input-group">
-                        <button class="btn btn-secondary" id="clearBtn">
-                            <span>🗑️</span> Limpar Histórico
-                        </button>
-                        <button class="btn btn-danger" id="resetBtn">
-                            <span>🔄</span> Reiniciar Tudo
-                        </button>
-                    </div>
-                </div>
-                
-                <h3 style="margin-top: 25px; color: var(--gold-light);">Histórico de Números</h3>
-                <div class="numbers-history" id="numbersHistory">
-                    <div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">
-                        Nenhum número adicionado ainda
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="totalNumbers">0</div>
-                        <div class="stat-label">Números Totais</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="activePatterns">0</div>
-                        <div class="stat-label">Padrões Ativos</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="confirmedPatterns">0</div>
-                        <div class="stat-label">Confirmados</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="greenSignals">0</div>
-                        <div class="stat-label">GREEN</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="redSignals">0</div>
-                        <div class="stat-label">RED</div>
-                    </div>
-                </div>
-            </div>
+    <!-- SISTEMA DE ACESSO (APARECE PRIMEIRO) -->
+    <div id="accessSystem" class="access-overlay">
+        <div class="access-box">
+            <h1 class="access-title">🎯 ARQUEIRO ROULETTE</h1>
+            <p style="color: var(--text-dim); margin-bottom: 30px;">Sistema VIP - Acesso Exclusivo</p>
             
-            <div id="confirmedPatternsHighlight"></div>
+            <p>Digite seu email autorizado:</p>
             
-            <div class="panel">
-                <div class="panel-title">
-                    <i>⚡</i> Padrões Ativos
-                </div>
-                <div id="activePatternsList">
-                    <div style="color: var(--text-dim); text-align: center; padding: 30px;">
-                        Nenhum padrão ativo no momento
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div>
-            <div class="panel">
-                <div class="tabs">
-                    <div class="tab active" data-tab="strategies">Estratégias</div>
-                    <div class="tab" data-tab="wheel">Roda</div>
-                    <div class="tab" data-tab="terminals">Terminais</div>
-                </div>
-                
-                <div id="strategies-tab" class="tab-content active">
-                    <div class="strategy-list">
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Duplo</div>
-                            <div class="strategy-desc">Número específico + 6 vizinhos</div>
-                        </div>
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Alternado</div>
-                            <div class="strategy-desc">Terminal com 1 vizinho</div>
-                        </div>
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Variável</div>
-                            <div class="strategy-desc">Sequência de terminais</div>
-                        </div>
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Central</div>
-                            <div class="strategy-desc">Terminal intermediário</div>
-                        </div>
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Gêmeos</div>
-                            <div class="strategy-desc">11, 22, 33 + 2 vizinhos</div>
-                        </div>
-                        <div class="strategy-card">
-                            <div class="strategy-name">Alvo Triângulo</div>
-                            <div class="strategy-desc">30, 31, 32 + 2 vizinhos</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="wheel-tab" class="tab-content">
-                    <h3 style="color: var(--gold-light); margin-bottom: 15px;">Sequência da Roda Europeia</h3>
-                    <div class="wheel-sequence">
-                        0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
-                    </div>
-                    <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-dim);">
-                        <strong>Nota:</strong> Para cada número, seus vizinhos são os números imediatamente anterior e posterior nesta sequência.
-                    </div>
-                </div>
-                
-                <div id="terminals-tab" class="tab-content">
-                    <h3 style="color: var(--gold-light); margin-bottom: 15px;">Terminais (Último Dígito)</h3>
-                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 15px;">
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 0</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">10, 20, 30</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 1</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">1, 11, 21, 31</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 2</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">2, 12, 22, 32</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 3</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">3, 13, 23, 33</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 4</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">4, 14, 24, 34</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 5</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">5, 15, 25, 35</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 6</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">6, 16, 26, 36</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 7</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">7, 17, 27</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 8</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">8, 18, 28</div>
-                        </div>
-                        <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <div style="font-weight: bold; color: var(--gold);">Terminal 9</div>
-                            <div style="font-size: 0.9rem; color: var(--text-dim);">9, 19, 29</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <input type="email" id="accessEmail" class="access-input" placeholder="seu@email.com" autocomplete="off">
             
-            <!-- Painel removido conforme solicitado -->
+            <button class="access-btn" onclick="verificarAcesso()">🔓 ENTRAR NO SISTEMA</button>
+            
+            <div id="accessMessage" class="access-message"></div>
+            
+            <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                Não tem acesso? Entre em contato com o administrador.
+            </p>
         </div>
     </div>
     
-    <div class="footer">
-        ARQUEIRO ROULETTE © 2023 | Sistema de análise para Roleta Europeia
+    <!-- SEU SISTEMA ORIGINAL (ESCONDIDO ATÉ LIBERAR ACESSO) -->
+    <div id="mainSystem" style="display: none;">
+        <header class="main-header">
+            <div class="brand">
+                <h1>ARQUEIRO</h1>
+                <h2>ROULETTE</h2>
+            </div>
+            
+            <div class="warning">⚠️ JOGUE COM RESPONSABILIDADE</div>
+            
+            <div class="cta-message">
+                <strong>Gostou? Chame o Arqueiro e aprenda essas e todas as outras análises especiais que ele guarda a 7 chaves!</strong>
+            </div>
+        </header>
+
+        <div class="container">
+            <div>
+                <div class="panel">
+                    <div class="panel-title">
+                        <i>🎯</i> Entrada de Números
+                    </div>
+                    
+                    <div class="input-section">
+                        <div class="input-group">
+                            <div class="number-input">
+                                <input type="number" id="numberInput" min="0" max="36" placeholder="Digite um número (0-36)">
+                            </div>
+                            <button class="btn btn-primary" id="addNumberBtn">
+                                <span>➕</span> Adicionar Número
+                            </button>
+                            <button class="btn btn-secondary" id="randomBtn">
+                                <span>🎲</span> Aleatório
+                            </button>
+                        </div>
+                        
+                        <div class="input-group">
+                            <button class="btn btn-secondary" id="clearBtn">
+                                <span>🗑️</span> Limpar Histórico
+                            </button>
+                            <button class="btn btn-danger" id="resetBtn">
+                                <span>🔄</span> Reiniciar Tudo
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 25px; color: var(--gold-light);">Histórico de Números</h3>
+                    <div class="numbers-history" id="numbersHistory">
+                        <div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">
+                            Nenhum número adicionado ainda
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-value" id="totalNumbers">0</div>
+                            <div class="stat-label">Números Totais</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="activePatterns">0</div>
+                            <div class="stat-label">Padrões Ativos</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="confirmedPatterns">0</div>
+                            <div class="stat-label">Confirmados</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="greenSignals">0</div>
+                            <div class="stat-label">GREEN</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="redSignals">0</div>
+                            <div class="stat-label">RED</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="confirmedPatternsHighlight"></div>
+                
+                <div class="panel">
+                    <div class="panel-title">
+                        <i>⚡</i> Padrões Ativos
+                    </div>
+                    <div id="activePatternsList">
+                        <div style="color: var(--text-dim); text-align: center; padding: 30px;">
+                            Nenhum padrão ativo no momento
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="panel">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="strategies">Estratégias</div>
+                        <div class="tab" data-tab="wheel">Roda</div>
+                        <div class="tab" data-tab="terminals">Terminais</div>
+                    </div>
+                    
+                    <div id="strategies-tab" class="tab-content active">
+                        <div class="strategy-list">
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Duplo</div>
+                                <div class="strategy-desc">Número específico + 6 vizinhos</div>
+                            </div>
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Alternado</div>
+                                <div class="strategy-desc">Terminal com 1 vizinho</div>
+                            </div>
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Variável</div>
+                                <div class="strategy-desc">Sequência de terminais</div>
+                            </div>
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Central</div>
+                                <div class="strategy-desc">Terminal intermediário</div>
+                            </div>
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Gêmeos</div>
+                                <div class="strategy-desc">11, 22, 33 + 2 vizinhos</div>
+                            </div>
+                            <div class="strategy-card">
+                                <div class="strategy-name">Alvo Triângulo</div>
+                                <div class="strategy-desc">30, 31, 32 + 2 vizinhos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="wheel-tab" class="tab-content">
+                        <h3 style="color: var(--gold-light); margin-bottom: 15px;">Sequência da Roda Europeia</h3>
+                        <div class="wheel-sequence">
+                            0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+                        </div>
+                        <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-dim);">
+                            <strong>Nota:</strong> Para cada número, seus vizinhos são os números imediatamente anterior e posterior nesta sequência.
+                        </div>
+                    </div>
+                    
+                    <div id="terminals-tab" class="tab-content">
+                        <h3 style="color: var(--gold-light); margin-bottom: 15px;">Terminais (Último Dígito)</h3>
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 15px;">
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 0</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">10, 20, 30</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 1</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">1, 11, 21, 31</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 2</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">2, 12, 22, 32</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 3</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">3, 13, 23, 33</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 4</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">4, 14, 24, 34</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 5</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">5, 15, 25, 35</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 6</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">6, 16, 26, 36</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 7</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">7, 17, 27</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 8</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">8, 18, 28</div>
+                            </div>
+                            <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                                <div style="font-weight: bold; color: var(--gold);">Terminal 9</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">9, 19, 29</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            ARQUEIRO ROULETTE © 2023 | Sistema de análise para Roleta Europeia
+        </div>
     </div>
 
     <script>
-        // Dados da roleta europeia
-        const wheelSequence = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-        
-        // Números vermelhos na roleta europeia
-        const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
-        
-        // Estado da aplicação
-        let numbersHistory = [];
-        let activePatterns = [];
-        let confirmedPatterns = [];
-        let completedPatterns = [];
-        let stats = {
-            totalNumbers: 0,
-            patternsTriggered: 0,
-            patternsConfirmed: 0,
-            patternsCancelled: 0,
-            greenSignals: 0,
-            redSignals: 0
-        };
+    // ========== SISTEMA DE ACESSO ==========
+    // VOCÊ EDITA APENAS ESTA LISTA!
+    const EMAILS_AUTORIZADOS = [
+        "SEUEMAIL@GMAIL.COM",      // SEU EMAIL (TROQUE ISSO!)
+        "cliente1@gmail.com",       // CLIENTE 1
+        "cliente2@hotmail.com",     // CLIENTE 2
+        "cliente3@yahoo.com.br"     // CLIENTE 3
+        // ADICIONE MAIS EMAILS AQUI ↓
+        // "novocliente@gmail.com",
+        // "outrocliente@email.com"
+    ];
+    // ========== FIM DA LISTA EDITÁVEL ==========
 
-        let multipleConfirmationsBlock = false;
+    function verificarAcesso() {
+        const email = document.getElementById('accessEmail').value.trim().toLowerCase();
+        const message = document.getElementById('accessMessage');
+        
+        // Limpar mensagem anterior
+        message.innerHTML = '';
+        message.className = 'access-message';
+        
+        if (!email || !email.includes('@')) {
+            message.innerHTML = '❌ Digite um email válido';
+            message.className = 'access-message access-error';
+            return;
+        }
+        
+        // Verificar se o email está na lista
+        const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
+        
+        if (lista.includes(email)) {
+            // Acesso permitido
+            localStorage.setItem('arqueiro_acesso', email);
+            
+            message.innerHTML = '✅ Acesso autorizado! Entrando no sistema...';
+            message.className = 'access-message access-success';
+            
+            // Mostrar sistema após 1 segundo
+            setTimeout(function() {
+                document.getElementById('accessSystem').style.display = 'none';
+                document.getElementById('mainSystem').style.display = 'block';
+            }, 1000);
+            
+        } else {
+            message.innerHTML = '❌ Email não autorizado.<br><br>Entre em contato para solicitar acesso.';
+            message.className = 'access-message access-error';
+        }
+    }
+    
+    // Verificar se já tem acesso salvo
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailSalvo = localStorage.getItem('arqueiro_acesso');
+        
+        if (emailSalvo) {
+            const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
+            
+            if (lista.includes(emailSalvo.toLowerCase())) {
+                // Já está logado e autorizado
+                document.getElementById('accessSystem').style.display = 'none';
+                document.getElementById('mainSystem').style.display = 'block';
+                return;
+            } else {
+                // Email não está mais na lista
+                localStorage.removeItem('arqueiro_acesso');
+            }
+        }
+        
+        // Se chegou aqui, mostrar tela de acesso
+        document.getElementById('accessSystem').style.display = 'flex';
+        document.getElementById('mainSystem').style.display = 'none';
+        
+        // Focar no campo de email
+        document.getElementById('accessEmail').focus();
+        
+        // Permitir Enter para enviar
+        document.getElementById('accessEmail').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarAcesso();
+            }
+        });
+    });
 
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
+    // ========== SEU CÓDIGO ORIGINAL DA ROLETA ==========
+    // Dados da roleta europeia
+    const wheelSequence = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    
+    // Números vermelhos na roleta europeia
+    const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
+    
+    // Estado da aplicação
+    let numbersHistory = [];
+    let activePatterns = [];
+    let confirmedPatterns = [];
+    let completedPatterns = [];
+    let stats = {
+        totalNumbers: 0,
+        patternsTriggered: 0,
+        patternsConfirmed: 0,
+        patternsCancelled: 0,
+        greenSignals: 0,
+        redSignals: 0
+    };
+
+    let multipleConfirmationsBlock = false;
+
+    // Inicialização DO SEU SISTEMA (só roda quando acesso for liberado)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Só inicializa se o sistema principal estiver visível
+        if (document.getElementById('mainSystem').style.display === 'block') {
             loadFromLocalStorage();
             updateDisplay();
             
@@ -830,284 +1000,175 @@ console.log("✅ Usuário autorizado:", emailSalvo);
                     document.getElementById(`${tabId}-tab`).classList.add('active');
                 });
             });
+        }
+    });
+
+    function addNumber() {
+        const input = document.getElementById('numberInput');
+        const number = parseInt(input.value);
+        
+        if (isNaN(number) || number < 0 || number > 36) {
+            alert('Por favor, digite um número válido entre 0 e 36.');
+            return;
+        }
+        
+        numbersHistory.push(number);
+        stats.totalNumbers++;
+        
+        processNewNumber(number);
+        
+        input.value = '';
+        input.focus();
+        
+        updateDisplay();
+        saveToLocalStorage();
+    }
+
+    function addRandomNumber() {
+        const randomNumber = Math.floor(Math.random() * 37);
+        document.getElementById('numberInput').value = randomNumber;
+        addNumber();
+    }
+
+    // FUNÇÃO PRINCIPAL CORRIGIDA
+    function processNewNumber(number) {
+        console.log(`=== PROCESSANDO NÚMERO ${number} ===`);
+        
+        // 1. Primeiro verificar resultados de padrões já confirmados
+        checkConfirmedPatternResults(number);
+        
+        // 2. Verificar cancelamento de padrões ativos
+        activePatterns.forEach(pattern => {
+            if (pattern.status === 'active' && pattern.cancellationSet.includes(number)) {
+                pattern.status = 'cancelled';
+                pattern.cancelledBy = number;
+                stats.patternsCancelled++;
+                console.log(`❌ ${pattern.name} CANCELADO por ${number}`);
+            }
         });
-
-        function addNumber() {
-            const input = document.getElementById('numberInput');
-            const number = parseInt(input.value);
-            
-            if (isNaN(number) || number < 0 || number > 36) {
-                alert('Por favor, digite um número válido entre 0 e 36.');
-                return;
-            }
-            
-            numbersHistory.push(number);
-            stats.totalNumbers++;
-            
-            processNewNumber(number);
-            
-            input.value = '';
-            input.focus();
-            
-            updateDisplay();
-            saveToLocalStorage();
-        }
-
-        function addRandomNumber() {
-            const randomNumber = Math.floor(Math.random() * 37);
-            document.getElementById('numberInput').value = randomNumber;
-            addNumber();
-        }
-
-        // FUNÇÃO PRINCIPAL CORRIGIDA
-        function processNewNumber(number) {
-            console.log(`=== PROCESSANDO NÚMERO ${number} ===`);
-            
-            // 1. Primeiro verificar resultados de padrões já confirmados
-            checkConfirmedPatternResults(number);
-            
-            // 2. Verificar cancelamento de padrões ativos
-            activePatterns.forEach(pattern => {
-                if (pattern.status === 'active' && pattern.cancellationSet.includes(number)) {
-                    pattern.status = 'cancelled';
-                    pattern.cancelledBy = number;
-                    stats.patternsCancelled++;
-                    console.log(`❌ ${pattern.name} CANCELADO por ${number}`);
-                }
-            });
-            
-            // 3. Atualizar confirmações de padrões ativos NÃO cancelados
-            activePatterns.forEach(pattern => {
-                if (pattern.status === 'active') {
-                    if (!pattern.cancellationSet.includes(number)) {
-                        pattern.confirmationCount++;
-                        console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/5`);
+        
+        // 3. Atualizar confirmações de padrões ativos NÃO cancelados
+        activePatterns.forEach(pattern => {
+            if (pattern.status === 'active') {
+                if (!pattern.cancellationSet.includes(number)) {
+                    pattern.confirmationCount++;
+                    console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/5`);
+                    
+                    // ALTERAÇÃO AQUI: de 3 para 5
+                    if (pattern.confirmationCount >= 5) {
+                        pattern.status = 'confirmed';
+                        pattern.confirmedAt = numbersHistory.length;
+                        pattern.checkedNumbers = 0;
+                        pattern.lastConfirmedNumber = number;
+                        stats.patternsConfirmed++;
+                        console.log(`✅ ${pattern.name} CONFIRMADO! Aguardando próximos 3 números...`);
                         
-                        // ALTERAÇÃO AQUI: de 3 para 5
-                        if (pattern.confirmationCount >= 5) {
-                            pattern.status = 'confirmed';
-                            pattern.confirmedAt = numbersHistory.length;
-                            pattern.checkedNumbers = 0;
-                            pattern.lastConfirmedNumber = number;
-                            stats.patternsConfirmed++;
-                            console.log(`✅ ${pattern.name} CONFIRMADO! Aguardando próximos 3 números...`);
-                            
-                            confirmedPatterns.push(pattern);
-                        }
+                        confirmedPatterns.push(pattern);
                     }
                 }
-            });
-            
-            // CORREÇÃO: Remover padrões cancelados e confirmados dos ativos
-            activePatterns = activePatterns.filter(pattern => 
-                pattern.status === 'active' && pattern.status !== 'cancelled' && pattern.status !== 'confirmed'
-            );
-            
-            // 4. Verificar novos padrões
-            checkForNewPatterns();
-            
-            // 5. Verificar múltiplos confirmados
-            checkMultipleConfirmations();
-        }
+            }
+        });
+        
+        // CORREÇÃO: Remover padrões cancelados e confirmados dos ativos
+        activePatterns = activePatterns.filter(pattern => 
+            pattern.status === 'active' && pattern.status !== 'cancelled' && pattern.status !== 'confirmed'
+        );
+        
+        // 4. Verificar novos padrões
+        checkForNewPatterns();
+        
+        // 5. Verificar múltiplos confirmados
+        checkMultipleConfirmations();
+    }
 
-        // FUNÇÃO CORRIGIDA - Testes GREEN/RED começam após confirmação
-        function checkConfirmedPatternResults(number) {
-            confirmedPatterns.forEach((pattern, index) => {
-                if (pattern.status === 'confirmed') {
-                    // NÃO incrementar se este é o número que confirmou
-                    if (number === pattern.lastConfirmedNumber) {
-                        console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
-                        return;
+    // FUNÇÃO CORRIGIDA - Testes GREEN/RED começam após confirmação
+    function checkConfirmedPatternResults(number) {
+        confirmedPatterns.forEach((pattern, index) => {
+            if (pattern.status === 'confirmed') {
+                // NÃO incrementar se este é o número que confirmou
+                if (number === pattern.lastConfirmedNumber) {
+                    console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
+                    return;
+                }
+                
+                // Só conta como teste se NÃO for o número que confirmou
+                pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
+                
+                console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
+                
+                // Verificar se saiu algum número que paga
+                if (pattern.betNumbers.includes(number)) {
+                    pattern.status = 'green';
+                    pattern.finalResult = 'green';
+                    pattern.winningNumber = number;
+                    stats.greenSignals++;
+                    
+                    console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
+                    
+                    completedPatterns.push(pattern);
+                    confirmedPatterns.splice(index, 1);
+                    
+                    if (multipleConfirmationsBlock) {
+                        multipleConfirmationsBlock = false;
                     }
+                } 
+                else if (pattern.checkedNumbers >= 3) {
+                    pattern.status = 'red';
+                    pattern.finalResult = 'red';
+                    stats.redSignals++;
                     
-                    // Só conta como teste se NÃO for o número que confirmou
-                    pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
+                    console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
                     
-                    console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
+                    completedPatterns.push(pattern);
+                    confirmedPatterns.splice(index, 1);
                     
-                    // Verificar se saiu algum número que paga
-                    if (pattern.betNumbers.includes(number)) {
-                        pattern.status = 'green';
-                        pattern.finalResult = 'green';
-                        pattern.winningNumber = number;
-                        stats.greenSignals++;
-                        
-                        console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
-                        
-                        completedPatterns.push(pattern);
-                        confirmedPatterns.splice(index, 1);
-                        
-                        if (multipleConfirmationsBlock) {
-                            multipleConfirmationsBlock = false;
-                        }
-                    } 
-                    else if (pattern.checkedNumbers >= 3) {
-                        pattern.status = 'red';
-                        pattern.finalResult = 'red';
-                        stats.redSignals++;
-                        
-                        console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
-                        
-                        completedPatterns.push(pattern);
-                        confirmedPatterns.splice(index, 1);
-                        
-                        if (multipleConfirmationsBlock) {
-                            multipleConfirmationsBlock = false;
-                        }
+                    if (multipleConfirmationsBlock) {
+                        multipleConfirmationsBlock = false;
                     }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        function checkMultipleConfirmations() {
-            if (confirmedPatterns.length > 1 && !multipleConfirmationsBlock) {
-                console.log("⚠️ MÚLTIPLOS CONFIRMADOS DETECTADOS!");
-                multipleConfirmationsBlock = true;
-            }
-            
-            if (confirmedPatterns.length <= 1 && multipleConfirmationsBlock) {
-                multipleConfirmationsBlock = false;
-            }
+    function checkMultipleConfirmations() {
+        if (confirmedPatterns.length > 1 && !multipleConfirmationsBlock) {
+            console.log("⚠️ MÚLTIPLOS CONFIRMADOS DETECTADOS!");
+            multipleConfirmationsBlock = true;
         }
-
-        function checkForNewPatterns() {
-            if (numbersHistory.length < 2) return;
-            
-            if (multipleConfirmationsBlock) {
-                console.log("🚫 Bloqueio ativo: não criando novos padrões");
-                return;
-            }
-            
-            const lastIndex = numbersHistory.length - 1;
-            const currentNumber = numbersHistory[lastIndex];
-            const lastNumber = numbersHistory[lastIndex - 1];
-            
-            console.log(`🔍 Verificando padrões entre: ${lastNumber} e ${currentNumber}`);
-            
-            // Estratégia 1: Alvo Duplo - 3 vizinhos = 6V
-            if (currentNumber === lastNumber && currentNumber !== 36) {
-                const target = (currentNumber + 1) % 37;
-                const neighbors = getNeighborsInWheel(target, 3);
-                const cancellationSet = [target, ...neighbors];
-                const betNumbers = [target, ...neighbors];
-                
-                const pattern = {
-                    id: generateId(),
-                    strategy: 1,
-                    name: 'Alvo Duplo',
-                    trigger: `${currentNumber}, ${currentNumber}`,
-                    targetDisplay: `${target} com 6V`,
-                    targetNumbers: [target],
-                    betNumbers: betNumbers,
-                    cancellationSet: cancellationSet,
-                    status: 'active',
-                    confirmationCount: 0,
-                    betSize: betNumbers.length,
-                    type: 'specific',
-                    createdAt: Date.now()
-                };
-                
-                if (!isPatternDuplicate(pattern)) {
-                    activePatterns.push(pattern);
-                    stats.patternsTriggered++;
-                    console.log(`🎯 NOVO: Alvo Duplo para ${target} com 6V`);
-                }
-            }
-            
-            // Estratégia 2: Alvo Alternado
-            const lastTerminal = lastNumber % 10;
-            const currentTerminal = currentNumber % 10;
-            
-            if (currentTerminal === lastTerminal && currentNumber !== lastNumber && currentTerminal !== 0) {
-                const targetTerminal = (currentTerminal - 1 + 10) % 10;
-                createTerminalPattern('Alvo Alternado', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-            }
-            
-            // Estratégia 3: Alvo Variável
-            const diff = Math.abs(currentTerminal - lastTerminal);
-            if (diff === 1) {
-                const isAscending = currentTerminal > lastTerminal;
-                let targetTerminal;
-                
-                if (isAscending) {
-                    targetTerminal = (currentTerminal + 1) % 10;
-                } else {
-                    targetTerminal = (Math.min(currentTerminal, lastTerminal) - 1 + 10) % 10;
-                }
-                
-                createTerminalPattern('Alvo Variável', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-            }
-            
-            // Estratégia 4: Alvo Central
-            if (diff === 2) {
-                const targetTerminal = Math.min(currentTerminal, lastTerminal) + 1;
-                createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-            }
-            
-            // Estratégia 5: Alvo Gêmeos - 2V
-            if ([11, 22, 33].includes(currentNumber)) {
-                createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
-            }
-            
-            // Estratégia 6: Alvo Triângulo - 2V
-            if ([30, 31, 32].includes(currentNumber)) {
-                createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
-            }
+        
+        if (confirmedPatterns.length <= 1 && multipleConfirmationsBlock) {
+            multipleConfirmationsBlock = false;
         }
+    }
 
-        function createTerminalPattern(name, trigger, targetTerminal) {
-            const targetNumbers = getNumbersByTerminal(targetTerminal);
-            const neighbors = [];
-            
-            targetNumbers.forEach(num => {
-                neighbors.push(...getNeighborsInWheel(num, 1));
-            });
-            
-            const cancellationSet = [...targetNumbers, ...neighbors];
-            const betNumbers = [...targetNumbers, ...neighbors];
+    function checkForNewPatterns() {
+        if (numbersHistory.length < 2) return;
+        
+        if (multipleConfirmationsBlock) {
+            console.log("🚫 Bloqueio ativo: não criando novos padrões");
+            return;
+        }
+        
+        const lastIndex = numbersHistory.length - 1;
+        const currentNumber = numbersHistory[lastIndex];
+        const lastNumber = numbersHistory[lastIndex - 1];
+        
+        console.log(`🔍 Verificando padrões entre: ${lastNumber} e ${currentNumber}`);
+        
+        // Estratégia 1: Alvo Duplo - 3 vizinhos = 6V
+        if (currentNumber === lastNumber && currentNumber !== 36) {
+            const target = (currentNumber + 1) % 37;
+            const neighbors = getNeighborsInWheel(target, 3);
+            const cancellationSet = [target, ...neighbors];
+            const betNumbers = [target, ...neighbors];
             
             const pattern = {
                 id: generateId(),
-                strategy: name === 'Alvo Alternado' ? 2 : name === 'Alvo Variável' ? 3 : 4,
-                name: name,
-                trigger: trigger,
-                targetDisplay: `T${targetTerminal} com 1V`,
-                targetNumbers: targetNumbers,
-                betNumbers: betNumbers,
-                cancellationSet: cancellationSet,
-                status: 'active',
-                confirmationCount: 0,
-                betSize: betNumbers.length,
-                type: 'terminal',
-                createdAt: Date.now()
-            };
-            
-            if (!isPatternDuplicate(pattern)) {
-                activePatterns.push(pattern);
-                stats.patternsTriggered++;
-                console.log(`🎯 NOVO: ${name} para T${targetTerminal} com 1V`);
-            }
-        }
-
-        function createGemeosTriangulo(name, trigger, targetNumbers, neighborCount) {
-            const neighbors = [];
-            
-            targetNumbers.forEach(num => {
-                neighbors.push(...getNeighborsInWheel(num, neighborCount));
-            });
-            
-            const cancellationSet = [...targetNumbers, ...neighbors];
-            const betNumbers = [...targetNumbers, ...neighbors];
-            
-            const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
-            
-            const pattern = {
-                id: generateId(),
-                strategy: name === 'Alvo Gêmeos' ? 5 : 6,
-                name: name,
-                trigger: trigger,
-                targetDisplay: `${displayName} com ${neighborCount}V`,
-                targetNumbers: targetNumbers,
+                strategy: 1,
+                name: 'Alvo Duplo',
+                trigger: `${currentNumber}, ${currentNumber}`,
+                targetDisplay: `${target} com 6V`,
+                targetNumbers: [target],
                 betNumbers: betNumbers,
                 cancellationSet: cancellationSet,
                 status: 'active',
@@ -1120,168 +1181,309 @@ console.log("✅ Usuário autorizado:", emailSalvo);
             if (!isPatternDuplicate(pattern)) {
                 activePatterns.push(pattern);
                 stats.patternsTriggered++;
-                console.log(`🎯 NOVO: ${name} com ${neighborCount}V`);
+                console.log(`🎯 NOVO: Alvo Duplo para ${target} com 6V`);
             }
         }
-
-        function isPatternDuplicate(newPattern) {
-            const isActiveDuplicate = activePatterns.some(pattern => 
-                pattern.strategy === newPattern.strategy &&
-                pattern.trigger === newPattern.trigger &&
-                pattern.status === 'active'
-            );
-            
-            const isConfirmedDuplicate = confirmedPatterns.some(pattern =>
-                pattern.strategy === newPattern.strategy &&
-                pattern.trigger === newPattern.trigger
-            );
-            
-            return isActiveDuplicate || isConfirmedDuplicate;
+        
+        // Estratégia 2: Alvo Alternado
+        const lastTerminal = lastNumber % 10;
+        const currentTerminal = currentNumber % 10;
+        
+        if (currentTerminal === lastTerminal && currentNumber !== lastNumber && currentTerminal !== 0) {
+            const targetTerminal = (currentTerminal - 1 + 10) % 10;
+            createTerminalPattern('Alvo Alternado', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
-
-        function getNeighborsInWheel(number, count) {
-            const index = wheelSequence.indexOf(number);
+        
+        // Estratégia 3: Alvo Variável
+        const diff = Math.abs(currentTerminal - lastTerminal);
+        if (diff === 1) {
+            const isAscending = currentTerminal > lastTerminal;
+            let targetTerminal;
             
-            if (index === -1) {
-                console.error(`Número ${number} não encontrado na sequência da roda!`);
-                return [];
+            if (isAscending) {
+                targetTerminal = (currentTerminal + 1) % 10;
+            } else {
+                targetTerminal = (Math.min(currentTerminal, lastTerminal) - 1 + 10) % 10;
             }
             
-            const neighbors = [];
+            createTerminalPattern('Alvo Variável', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
+        }
+        
+        // Estratégia 4: Alvo Central
+        if (diff === 2) {
+            const targetTerminal = Math.min(currentTerminal, lastTerminal) + 1;
+            createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
+        }
+        
+        // Estratégia 5: Alvo Gêmeos - 2V
+        if ([11, 22, 33].includes(currentNumber)) {
+            createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
+        }
+        
+        // Estratégia 6: Alvo Triângulo - 2V
+        if ([30, 31, 32].includes(currentNumber)) {
+            createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
+        }
+    }
+
+    function createTerminalPattern(name, trigger, targetTerminal) {
+        const targetNumbers = getNumbersByTerminal(targetTerminal);
+        const neighbors = [];
+        
+        targetNumbers.forEach(num => {
+            neighbors.push(...getNeighborsInWheel(num, 1));
+        });
+        
+        const cancellationSet = [...targetNumbers, ...neighbors];
+        const betNumbers = [...targetNumbers, ...neighbors];
+        
+        const pattern = {
+            id: generateId(),
+            strategy: name === 'Alvo Alternado' ? 2 : name === 'Alvo Variável' ? 3 : 4,
+            name: name,
+            trigger: trigger,
+            targetDisplay: `T${targetTerminal} com 1V`,
+            targetNumbers: targetNumbers,
+            betNumbers: betNumbers,
+            cancellationSet: cancellationSet,
+            status: 'active',
+            confirmationCount: 0,
+            betSize: betNumbers.length,
+            type: 'terminal',
+            createdAt: Date.now()
+        };
+        
+        if (!isPatternDuplicate(pattern)) {
+            activePatterns.push(pattern);
+            stats.patternsTriggered++;
+            console.log(`🎯 NOVO: ${name} para T${targetTerminal} com 1V`);
+        }
+    }
+
+    function createGemeosTriangulo(name, trigger, targetNumbers, neighborCount) {
+        const neighbors = [];
+        
+        targetNumbers.forEach(num => {
+            neighbors.push(...getNeighborsInWheel(num, neighborCount));
+        });
+        
+        const cancellationSet = [...targetNumbers, ...neighbors];
+        const betNumbers = [...targetNumbers, ...neighbors];
+        
+        const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
+        
+        const pattern = {
+            id: generateId(),
+            strategy: name === 'Alvo Gêmeos' ? 5 : 6,
+            name: name,
+            trigger: trigger,
+            targetDisplay: `${displayName} com ${neighborCount}V`,
+            targetNumbers: targetNumbers,
+            betNumbers: betNumbers,
+            cancellationSet: cancellationSet,
+            status: 'active',
+            confirmationCount: 0,
+            betSize: betNumbers.length,
+            type: 'specific',
+            createdAt: Date.now()
+        };
+        
+        if (!isPatternDuplicate(pattern)) {
+            activePatterns.push(pattern);
+            stats.patternsTriggered++;
+            console.log(`🎯 NOVO: ${name} com ${neighborCount}V`);
+        }
+    }
+
+    function isPatternDuplicate(newPattern) {
+        const isActiveDuplicate = activePatterns.some(pattern => 
+            pattern.strategy === newPattern.strategy &&
+            pattern.trigger === newPattern.trigger &&
+            pattern.status === 'active'
+        );
+        
+        const isConfirmedDuplicate = confirmedPatterns.some(pattern =>
+            pattern.strategy === newPattern.strategy &&
+            pattern.trigger === newPattern.trigger
+        );
+        
+        return isActiveDuplicate || isConfirmedDuplicate;
+    }
+
+    function getNeighborsInWheel(number, count) {
+        const index = wheelSequence.indexOf(number);
+        
+        if (index === -1) {
+            console.error(`Número ${number} não encontrado na sequência da roda!`);
+            return [];
+        }
+        
+        const neighbors = [];
+        
+        for (let i = 1; i <= count; i++) {
+            const aboveIndex = (index - i + wheelSequence.length) % wheelSequence.length;
+            neighbors.push(wheelSequence[aboveIndex]);
             
-            for (let i = 1; i <= count; i++) {
-                const aboveIndex = (index - i + wheelSequence.length) % wheelSequence.length;
-                neighbors.push(wheelSequence[aboveIndex]);
+            const belowIndex = (index + i) % wheelSequence.length;
+            neighbors.push(wheelSequence[belowIndex]);
+        }
+        
+        return neighbors;
+    }
+
+    function getNumbersByTerminal(terminal) {
+        return wheelSequence.filter(num => num % 10 === terminal);
+    }
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function getColorForNumber(num) {
+        if (num === 0) return '#2E8B57';
+        return redNumbers.includes(num) ? '#DC143C' : '#333';
+    }
+
+    function updateDisplay() {
+        const numbersHistoryElement = document.getElementById('numbersHistory');
+        numbersHistoryElement.innerHTML = '';
+        
+        if (numbersHistory.length === 0) {
+            numbersHistoryElement.innerHTML = '<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';
+        } else {
+            numbersHistory.slice().reverse().forEach((num, index) => {
+                const isLatest = index === 0;
+                const chip = document.createElement('div');
+                chip.className = `number-chip ${num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black'} ${isLatest ? 'latest' : ''}`;
+                chip.textContent = num;
                 
-                const belowIndex = (index + i) % wheelSequence.length;
-                neighbors.push(wheelSequence[belowIndex]);
-            }
-            
-            return neighbors;
+                const position = numbersHistory.length - index;
+                chip.title = `Posição: ${position}${isLatest ? ' (Último)' : ''}`;
+                
+                numbersHistoryElement.appendChild(chip);
+            });
         }
-
-        function getNumbersByTerminal(terminal) {
-            return wheelSequence.filter(num => num % 10 === terminal);
+        
+        document.getElementById('totalNumbers').textContent = stats.totalNumbers;
+        document.getElementById('activePatterns').textContent = activePatterns.length;
+        document.getElementById('confirmedPatterns').textContent = confirmedPatterns.length;
+        document.getElementById('greenSignals').textContent = stats.greenSignals;
+        document.getElementById('redSignals').textContent = stats.redSignals;
+        
+        const confirmedHighlight = document.getElementById('confirmedPatternsHighlight');
+        confirmedHighlight.innerHTML = '';
+        
+        if (confirmedPatterns.length > 0) {
+            confirmedPatterns.forEach(pattern => {
+                const panel = document.createElement('div');
+                panel.className = 'panel confirmed-highlight';
+                
+                const numbersSinceConfirmation = pattern.checkedNumbers || 0;
+                const remainingNumbers = Math.max(0, 3 - numbersSinceConfirmation);
+                
+                panel.innerHTML = `
+                    <div class="panel-title">
+                        <i>🚨</i> SINAL CONFIRMADO - APOSTE AGORA!
+                    </div>
+                    <div class="pattern-header">
+                        <div class="pattern-title">${pattern.name}</div>
+                        <div class="pattern-status status-confirmed">CONFIRMADO</div>
+                    </div>
+                    <div class="pattern-details"><strong>Gatilho:</strong> ${pattern.trigger}</div>
+                    <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
+                    <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${pattern.betSize} números</div>
+                    <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${numbersSinceConfirmation}/3</div>
+                    <div class="pattern-details"><strong>Números para apostar:</strong></div>
+                    <div class="pattern-numbers">
+                        ${pattern.betNumbers.map(num => {
+                            const isTarget = pattern.targetNumbers.includes(num);
+                            const colorClass = num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black';
+                            return `<div class="pattern-number ${colorClass} ${isTarget ? 'target' : ''}" style="background-color: ${getColorForNumber(num)}">${num}</div>`;
+                        }).join('')}
+                    </div>
+                `;
+                
+                confirmedHighlight.appendChild(panel);
+            });
         }
-
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        
+        const activePatternsList = document.getElementById('activePatternsList');
+        activePatternsList.innerHTML = '';
+        
+        // CORREÇÃO: Mostrar apenas padrões ATIVOS (não cancelados)
+        const activePatternsFiltered = activePatterns.filter(pattern => pattern.status === 'active');
+        
+        if (activePatternsFiltered.length === 0) {
+            activePatternsList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 30px;">Nenhum padrão ativo no momento</div>';
+        } else {
+            activePatternsFiltered.forEach(pattern => {
+                const patternCard = document.createElement('div');
+                patternCard.className = 'pattern-card';
+                
+                // ALTERAÇÃO AQUI: de 3 para 5
+                patternCard.innerHTML = `
+                    <div class="pattern-header">
+                        <div class="pattern-title">${pattern.name}</div>
+                        <div class="pattern-status status-active">Ativo</div>
+                    </div>
+                    <div class="pattern-details">Gatilho: ${pattern.trigger}</div>
+                    <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
+                    <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/5</div>
+                `;
+                
+                activePatternsList.appendChild(patternCard);
+            });
         }
+    }
 
-        function getColorForNumber(num) {
-            if (num === 0) return '#2E8B57';
-            return redNumbers.includes(num) ? '#DC143C' : '#333';
+    function clearHistory() {
+        if (confirm('Tem certeza que deseja limpar o histórico?')) {
+            numbersHistory = [];
+            stats.totalNumbers = 0;
+            updateDisplay();
+            saveToLocalStorage();
         }
+    }
 
-        function updateDisplay() {
-            const numbersHistoryElement = document.getElementById('numbersHistory');
-            numbersHistoryElement.innerHTML = '';
+    function resetAll() {
+        if (confirm('Tem certeza que deseja reiniciar tudo?')) {
+            numbersHistory = [];
+            activePatterns = [];
+            confirmedPatterns = [];
+            completedPatterns = [];
+            multipleConfirmationsBlock = false;
+            stats = {
+                totalNumbers: 0,
+                patternsTriggered: 0,
+                patternsConfirmed: 0,
+                patternsCancelled: 0,
+                greenSignals: 0,
+                redSignals: 0
+            };
             
-            if (numbersHistory.length === 0) {
-                numbersHistoryElement.innerHTML = '<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';
-            } else {
-                numbersHistory.slice().reverse().forEach((num, index) => {
-                    const isLatest = index === 0;
-                    const chip = document.createElement('div');
-                    chip.className = `number-chip ${num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black'} ${isLatest ? 'latest' : ''}`;
-                    chip.textContent = num;
-                    
-                    const position = numbersHistory.length - index;
-                    chip.title = `Posição: ${position}${isLatest ? ' (Último)' : ''}`;
-                    
-                    numbersHistoryElement.appendChild(chip);
-                });
-            }
-            
-            document.getElementById('totalNumbers').textContent = stats.totalNumbers;
-            document.getElementById('activePatterns').textContent = activePatterns.length;
-            document.getElementById('confirmedPatterns').textContent = confirmedPatterns.length;
-            document.getElementById('greenSignals').textContent = stats.greenSignals;
-            document.getElementById('redSignals').textContent = stats.redSignals;
-            
-            const confirmedHighlight = document.getElementById('confirmedPatternsHighlight');
-            confirmedHighlight.innerHTML = '';
-            
-            if (confirmedPatterns.length > 0) {
-                confirmedPatterns.forEach(pattern => {
-                    const panel = document.createElement('div');
-                    panel.className = 'panel confirmed-highlight';
-                    
-                    const numbersSinceConfirmation = pattern.checkedNumbers || 0;
-                    const remainingNumbers = Math.max(0, 3 - numbersSinceConfirmation);
-                    
-                    panel.innerHTML = `
-                        <div class="panel-title">
-                            <i>🚨</i> SINAL CONFIRMADO - APOSTE AGORA!
-                        </div>
-                        <div class="pattern-header">
-                            <div class="pattern-title">${pattern.name}</div>
-                            <div class="pattern-status status-confirmed">CONFIRMADO</div>
-                        </div>
-                        <div class="pattern-details"><strong>Gatilho:</strong> ${pattern.trigger}</div>
-                        <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                        <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${pattern.betSize} números</div>
-                        <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${numbersSinceConfirmation}/3</div>
-                        <div class="pattern-details"><strong>Números para apostar:</strong></div>
-                        <div class="pattern-numbers">
-                            ${pattern.betNumbers.map(num => {
-                                const isTarget = pattern.targetNumbers.includes(num);
-                                const colorClass = num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black';
-                                return `<div class="pattern-number ${colorClass} ${isTarget ? 'target' : ''}" style="background-color: ${getColorForNumber(num)}">${num}</div>`;
-                            }).join('')}
-                        </div>
-                    `;
-                    
-                    confirmedHighlight.appendChild(panel);
-                });
-            }
-            
-            const activePatternsList = document.getElementById('activePatternsList');
-            activePatternsList.innerHTML = '';
-            
-            // CORREÇÃO: Mostrar apenas padrões ATIVOS (não cancelados)
-            const activePatternsFiltered = activePatterns.filter(pattern => pattern.status === 'active');
-            
-            if (activePatternsFiltered.length === 0) {
-                activePatternsList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 30px;">Nenhum padrão ativo no momento</div>';
-            } else {
-                activePatternsFiltered.forEach(pattern => {
-                    const patternCard = document.createElement('div');
-                    patternCard.className = 'pattern-card';
-                    
-                    // ALTERAÇÃO AQUI: de 3 para 5
-                    patternCard.innerHTML = `
-                        <div class="pattern-header">
-                            <div class="pattern-title">${pattern.name}</div>
-                            <div class="pattern-status status-active">Ativo</div>
-                        </div>
-                        <div class="pattern-details">Gatilho: ${pattern.trigger}</div>
-                        <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                        <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/5</div>
-                    `;
-                    
-                    activePatternsList.appendChild(patternCard);
-                });
-            }
+            updateDisplay();
+            localStorage.removeItem('arqueiroRouletteData');
         }
+    }
 
-        function clearHistory() {
-            if (confirm('Tem certeza que deseja limpar o histórico?')) {
-                numbersHistory = [];
-                stats.totalNumbers = 0;
-                updateDisplay();
-                saveToLocalStorage();
-            }
-        }
+    function saveToLocalStorage() {
+        const data = {
+            numbersHistory,
+            stats,
+            version: 'FINAL_COMPLETO'
+        };
+        
+        localStorage.setItem('arqueiroRouletteData', JSON.stringify(data));
+    }
 
-        function resetAll() {
-            if (confirm('Tem certeza que deseja reiniciar tudo?')) {
-                numbersHistory = [];
-                activePatterns = [];
-                confirmedPatterns = [];
-                completedPatterns = [];
-                multipleConfirmationsBlock = false;
-                stats = {
+    function loadFromLocalStorage() {
+        const savedData = localStorage.getItem('arqueiroRouletteData');
+        
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                numbersHistory = data.numbersHistory || [];
+                stats = data.stats || {
                     totalNumbers: 0,
                     patternsTriggered: 0,
                     patternsConfirmed: 0,
@@ -1290,61 +1492,30 @@ console.log("✅ Usuário autorizado:", emailSalvo);
                     redSignals: 0
                 };
                 
-                updateDisplay();
-                localStorage.removeItem('arqueiroRouletteData');
+                activePatterns = [];
+                confirmedPatterns = [];
+                completedPatterns = [];
+                multipleConfirmationsBlock = false;
+                
+                numbersHistory.forEach((num, index) => {
+                    if (index > 0) {
+                        processNewNumber(num);
+                    }
+                });
+            } catch (e) {
+                console.error("Erro ao carregar dados salvos:", e);
+                numbersHistory = [];
+                stats = {
+                    totalNumbers: 0,
+                    patternsTriggered: 0,
+                    patternsConfirmed: 0,
+                    patternsCancelled: 0,
+                    greenSignals: 0,
+                    redSignals: 0
+                };
             }
         }
-
-        function saveToLocalStorage() {
-            const data = {
-                numbersHistory,
-                stats,
-                version: 'FINAL_COMPLETO'
-            };
-            
-            localStorage.setItem('arqueiroRouletteData', JSON.stringify(data));
-        }
-
-        function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('arqueiroRouletteData');
-            
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    numbersHistory = data.numbersHistory || [];
-                    stats = data.stats || {
-                        totalNumbers: 0,
-                        patternsTriggered: 0,
-                        patternsConfirmed: 0,
-                        patternsCancelled: 0,
-                        greenSignals: 0,
-                        redSignals: 0
-                    };
-                    
-                    activePatterns = [];
-                    confirmedPatterns = [];
-                    completedPatterns = [];
-                    multipleConfirmationsBlock = false;
-                    
-                    numbersHistory.forEach((num, index) => {
-                        if (index > 0) {
-                            processNewNumber(num);
-                        }
-                    });
-                } catch (e) {
-                    console.error("Erro ao carregar dados salvos:", e);
-                    numbersHistory = [];
-                    stats = {
-                        totalNumbers: 0,
-                        patternsTriggered: 0,
-                        patternsConfirmed: 0,
-                        patternsCancelled: 0,
-                        greenSignals: 0,
-                        redSignals: 0
-                    };
-                }
-            }
-        }
+    }
     </script>
 </body>
 </html>
