@@ -1476,16 +1476,13 @@
         saveToLocalStorage();
     }
 
-    // ========== CORREÇÃO 1: APAGAR PADRÕES JUNTO COM O NÚMERO ==========
     function clearLastNumber() {
         if (numbersHistory.length > 0) {
             const removed = numbersHistory.pop();
             stats.totalNumbers--;
             
-            // REMOVER TODOS OS PADRÕES QUE FORAM CRIADOS POR ESTE NÚMERO
             const beforeCount = activePatterns.length;
             activePatterns = activePatterns.filter(pattern => {
-                // Verifica se o gatilho contém o número removido
                 if (pattern.trigger && pattern.trigger.includes(removed.toString())) {
                     console.log(`🗑️ Padrão ${pattern.name} removido (gatilho: ${pattern.trigger})`);
                     return false;
@@ -1493,7 +1490,7 @@
                 return true;
             });
             
-            console.log(`↩️ Número ${removed} removido. ${activePatterns.length} padrões ativos restantes (removidos ${beforeCount - activePatterns.length})`);
+            console.log(`↩️ Número ${removed} removido. ${activePatterns.length} padrões ativos restantes`);
             updateDisplay();
             saveToLocalStorage();
         }
@@ -1543,23 +1540,18 @@
         checkMultipleConfirmations();
     }
 
-    // ========== CORREÇÃO 2: PAGAR TODOS OS PADRÕES QUE ACERTAREM ==========
     function checkConfirmedPatternResults(number) {
-        // Processar TODOS os padrões confirmados, sem remover durante o loop
         const patternsToProcess = [...confirmedPatterns];
         let removedIndices = [];
         
         patternsToProcess.forEach((pattern, processIndex) => {
             if (pattern.status === 'confirmed') {
-                // Verifica se é o número que confirmou - NÃO conta como teste
                 if (number === pattern.lastConfirmedNumber) {
                     console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
                 } else {
-                    // Incrementa o contador de testes
                     pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
                     console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                     
-                    // Verifica se acertou - PAGA TODOS QUE ACERTAREM
                     if (pattern.betNumbers.includes(number)) {
                         pattern.status = 'green';
                         pattern.finalResult = 'green';
@@ -1567,20 +1559,16 @@
                         stats.greenSignals++;
                         console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
                         
-                        // Marca para remoção
                         const originalIndex = confirmedPatterns.indexOf(pattern);
                         if (originalIndex !== -1) removedIndices.push(originalIndex);
                         
                         if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                    } 
-                    // Verifica se perdeu (3 testes sem acerto)
-                    else if (pattern.checkedNumbers >= 3) {
+                    } else if (pattern.checkedNumbers >= 3) {
                         pattern.status = 'red';
                         pattern.finalResult = 'red';
                         stats.redSignals++;
                         console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
                         
-                        // Marca para remoção
                         const originalIndex = confirmedPatterns.indexOf(pattern);
                         if (originalIndex !== -1) removedIndices.push(originalIndex);
                         
@@ -1590,7 +1578,6 @@
             }
         });
         
-        // Remove os padrões processados (do maior índice para o menor)
         if (removedIndices.length > 0) {
             removedIndices.sort((a, b) => b - a).forEach(index => {
                 const removed = confirmedPatterns.splice(index, 1)[0];
@@ -1622,11 +1609,17 @@
         
         console.log(`🔍 Verificando padrões entre: ${lastNumber} e ${currentNumber}`);
         
+        // ========== ALVO DUPLO - CORRIGIDO ==========
         if (currentNumber === lastNumber && currentNumber !== 36) {
             const target = (currentNumber + 1) % 37;
-            const neighbors = getNeighborsInWheel(target, 3);
-            const cancellationSet = [target, ...neighbors];
-            const betNumbers = [target, ...neighbors];
+            
+            // Cancelamento: 3 vizinhos = 7 números
+            const neighborsCancel = getNeighborsInWheel(target, 3);
+            const cancellationSet = [target, ...neighborsCancel];
+            
+            // Pagamento: 6 vizinhos = 13 números
+            const neighborsPay = getNeighborsInWheel(target, 6);
+            const betNumbers = [target, ...neighborsPay];
             
             const pattern = {
                 id: generateId(),
@@ -1647,10 +1640,11 @@
             if (!isPatternDuplicate(pattern)) {
                 activePatterns.push(pattern);
                 stats.patternsTriggered++;
-                console.log(`🎯 NOVO: Alvo Duplo para ${target} com 6V`);
+                console.log(`🎯 NOVO: Alvo Duplo para ${target} | Cancelamento: ${cancellationSet.length} núm | Pagamento: ${betNumbers.length} núm`);
             }
         }
         
+        // ========== PADRÕES TERMINAIS ==========
         const lastTerminal = lastNumber % 10;
         const currentTerminal = currentNumber % 10;
         
@@ -1676,10 +1670,12 @@
             createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
         
+        // ========== ALVO GÊMEOS - CORRIGIDO ==========
         if ([11, 22, 33].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
         }
         
+        // ========== ALVO TRIÂNGULO - CORRIGIDO ==========
         if ([30, 31, 32].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
         }
@@ -1715,17 +1711,20 @@
         if (!isPatternDuplicate(pattern)) {
             activePatterns.push(pattern);
             stats.patternsTriggered++;
-            console.log(`🎯 NOVO: ${name} para T${targetTerminal} com 1V`);
+            console.log(`🎯 NOVO: ${name} para T${targetTerminal} | Cancelamento/Pagamento: ${cancellationSet.length} núm`);
         }
     }
 
+    // ========== ALVO GÊMEOS E TRIÂNGULO - CORRIGIDOS ==========
     function createGemeosTriangulo(name, trigger, targetNumbers, neighborCount) {
         const neighbors = [];
         
+        // neighborCount = 2 (sempre) - 2 vizinhos acima + 2 vizinhos abaixo = 4 vizinhos por número
         targetNumbers.forEach(num => {
-            neighbors.push(...getNeighborsInWheel(num, neighborCount));
+            neighbors.push(...getNeighborsInWheel(num, 2));
         });
         
+        // 3 alvos + 12 vizinhos = 15 números (tanto para cancelamento quanto pagamento)
         const cancellationSet = [...targetNumbers, ...neighbors];
         const betNumbers = [...targetNumbers, ...neighbors];
         const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
@@ -1735,7 +1734,7 @@
             strategy: name === 'Alvo Gêmeos' ? 5 : 6,
             name: name,
             trigger: trigger,
-            targetDisplay: `${displayName} com ${neighborCount}V`,
+            targetDisplay: `${displayName} com 2V`,
             targetNumbers: targetNumbers,
             betNumbers: betNumbers,
             cancellationSet: cancellationSet,
@@ -1749,7 +1748,7 @@
         if (!isPatternDuplicate(pattern)) {
             activePatterns.push(pattern);
             stats.patternsTriggered++;
-            console.log(`🎯 NOVO: ${name} com ${neighborCount}V`);
+            console.log(`🎯 NOVO: ${name} | Cancelamento/Pagamento: ${cancellationSet.length} núm`);
         }
     }
 
