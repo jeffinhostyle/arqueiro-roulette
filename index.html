@@ -1499,8 +1499,10 @@
     function processNewNumber(number) {
         console.log(`=== PROCESSANDO NÚMERO ${number} ===`);
         
+        // 1. Primeiro verificar resultados de padrões já confirmados
         checkConfirmedPatternResults(number);
         
+        // 2. Verificar cancelamento de padrões ativos
         activePatterns.forEach(pattern => {
             if (pattern.status === 'active' && pattern.cancellationSet.includes(number)) {
                 pattern.status = 'cancelled';
@@ -1510,6 +1512,7 @@
             }
         });
         
+        // 3. Atualizar confirmações de padrões ativos NÃO cancelados
         activePatterns.forEach(pattern => {
             if (pattern.status === 'active') {
                 if (!pattern.cancellationSet.includes(number)) {
@@ -1524,7 +1527,7 @@
                         pattern.checkedNumbers = 0;
                         pattern.lastConfirmedNumber = number;
                         stats.patternsConfirmed++;
-                        console.log(`✅ ${pattern.name} CONFIRMADO! Aguardando próximos 3 números...`);
+                        console.log(`✅ ${pattern.name} CONFIRMADO! Número ${number} NÃO conta como teste`);
                         
                         confirmedPatterns.push(pattern);
                     }
@@ -1532,11 +1535,15 @@
             }
         });
         
+        // 4. Remover padrões cancelados e confirmados dos ativos
         activePatterns = activePatterns.filter(pattern => 
             pattern.status === 'active'
         );
         
+        // 5. Verificar novos padrões
         checkForNewPatterns();
+        
+        // 6. Verificar múltiplos confirmados
         checkMultipleConfirmations();
     }
 
@@ -1546,9 +1553,8 @@
         
         patternsToProcess.forEach((pattern, processIndex) => {
             if (pattern.status === 'confirmed') {
-                if (number === pattern.lastConfirmedNumber) {
-                    console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
-                } else {
+                // SÓ PROCESSA SE NÃO FOR O NÚMERO QUE CONFIRMOU
+                if (number !== pattern.lastConfirmedNumber) {
                     pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
                     console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                     
@@ -1574,6 +1580,8 @@
                         
                         if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
                     }
+                } else {
+                    console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
                 }
             }
         });
@@ -1670,12 +1678,12 @@
             createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
         
-        // ========== ALVO GÊMEOS - CORRIGIDO ==========
+        // ========== ALVO GÊMEOS ==========
         if ([11, 22, 33].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
         }
         
-        // ========== ALVO TRIÂNGULO - CORRIGIDO ==========
+        // ========== ALVO TRIÂNGULO ==========
         if ([30, 31, 32].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
         }
@@ -1715,16 +1723,13 @@
         }
     }
 
-    // ========== ALVO GÊMEOS E TRIÂNGULO - CORRIGIDOS ==========
     function createGemeosTriangulo(name, trigger, targetNumbers, neighborCount) {
         const neighbors = [];
         
-        // neighborCount = 2 (sempre) - 2 vizinhos acima + 2 vizinhos abaixo = 4 vizinhos por número
         targetNumbers.forEach(num => {
             neighbors.push(...getNeighborsInWheel(num, 2));
         });
         
-        // 3 alvos + 12 vizinhos = 15 números (tanto para cancelamento quanto pagamento)
         const cancellationSet = [...targetNumbers, ...neighbors];
         const betNumbers = [...targetNumbers, ...neighbors];
         const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
