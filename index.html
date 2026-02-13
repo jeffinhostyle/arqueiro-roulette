@@ -193,7 +193,7 @@
             font-size: 1.2rem;
         }
 
-        /* ========== PAINEL DE ESTATÍSTICAS - ALINHAMENTO PERFEITO ========== */
+        /* ========== PAINEL DE ESTATÍSTICAS ========== */
         .stats-panel {
             background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
             border: 1px solid var(--gold);
@@ -229,7 +229,6 @@
             text-align: center;
         }
 
-        /* GRUPOS - 3 colunas perfeitamente distribuídas */
         .stats-grid-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -237,7 +236,6 @@
             width: 100%;
         }
 
-        /* LADOS e SETORES - 2 colunas */
         .stats-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -853,13 +851,13 @@
             </div>
         </header>
 
-        <!-- PAINEL DE ESTATÍSTICAS - ALINHAMENTO PERFEITO -->
+        <!-- PAINEL DE ESTATÍSTICAS -->
         <div class="stats-panel">
             <div class="stats-title">
                 <i>📊</i> ESTATÍSTICAS DO JOGO
             </div>
             
-            <!-- GRUPOS - 3 colunas igualmente distribuídas -->
+            <!-- GRUPOS -->
             <div class="stats-section">
                 <div class="stats-section-title">GRUPOS (1,4,7 | 2,5,8 | 0,3,6,9)</div>
                 <div class="stats-grid-3">
@@ -881,7 +879,7 @@
                 </div>
             </div>
             
-            <!-- LADOS CIMA10/BAIXO0 - 2 colunas -->
+            <!-- LADOS CIMA10/BAIXO0 -->
             <div class="stats-section">
                 <div class="stats-section-title">LADOS (CIMA 10 | BAIXO 0)</div>
                 <div class="stats-grid-2">
@@ -898,7 +896,7 @@
                 </div>
             </div>
             
-            <!-- SETORES LADO E/LADO D - 2 colunas -->
+            <!-- SETORES LADO E/LADO D -->
             <div class="stats-section">
                 <div class="stats-section-title">SETORES (LADO E | LADO D)</div>
                 <div class="stats-grid-2">
@@ -1181,21 +1179,16 @@
 
     function atualizarEstatisticas() {
         if (numbersHistory.length === 0) {
-            // Grupos
             document.getElementById('percent147').textContent = '0%';
             document.getElementById('count147').textContent = '0/0';
             document.getElementById('percent258').textContent = '0%';
             document.getElementById('count258').textContent = '0/0';
             document.getElementById('percent0369').textContent = '0%';
             document.getElementById('count0369').textContent = '0/0';
-            
-            // Lados Cima10/Baixo0
             document.getElementById('percentCima10').textContent = '0%';
             document.getElementById('countCima10').textContent = '0/0';
             document.getElementById('percentBaixo0').textContent = '0%';
             document.getElementById('countBaixo0').textContent = '0/0';
-            
-            // Lados E/D
             document.getElementById('percentLadoE').textContent = '0%';
             document.getElementById('countLadoE').textContent = '0/0';
             document.getElementById('percentLadoD').textContent = '0%';
@@ -1205,61 +1198,43 @@
         
         const total = numbersHistory.length;
         
-        // Contagem GRUPOS
         let count147 = 0, count258 = 0, count0369 = 0;
-        
-        // Contagem CIMA10/BAIXO0
         let countCima10 = 0, countBaixo0 = 0;
-        
-        // Contagem LADO E/LADO D
         let countLadoE = 0, countLadoD = 0;
         
         numbersHistory.forEach(num => {
-            // Grupos
             if (GRUPO_147.includes(num)) count147++;
             if (GRUPO_258.includes(num)) count258++;
             if (GRUPO_0369.includes(num)) count0369++;
-            
-            // Cima10/Baixo0
             if (CIMA_10.includes(num)) countCima10++;
             if (BAIXO_0.includes(num)) countBaixo0++;
-            
-            // Lado E/D
             if (LADO_E.includes(num)) countLadoE++;
             if (LADO_D.includes(num)) countLadoD++;
         });
         
-        // Percentuais GRUPOS (soma 100%)
         const totalGrupos = count147 + count258 + count0369;
         const percent147 = totalGrupos > 0 ? Math.round((count147 / totalGrupos) * 100) : 0;
         const percent258 = totalGrupos > 0 ? Math.round((count258 / totalGrupos) * 100) : 0;
         const percent0369 = totalGrupos > 0 ? Math.round((count0369 / totalGrupos) * 100) : 0;
         
-        // Percentuais CIMA10/BAIXO0 (soma 100%)
         const totalCimaBaixo = countCima10 + countBaixo0;
         const percentCima10 = totalCimaBaixo > 0 ? Math.round((countCima10 / totalCimaBaixo) * 100) : 0;
         const percentBaixo0 = totalCimaBaixo > 0 ? Math.round((countBaixo0 / totalCimaBaixo) * 100) : 0;
         
-        // Percentuais LADO E/LADO D (soma 100%)
         const totalLados = countLadoE + countLadoD;
         const percentLadoE = totalLados > 0 ? Math.round((countLadoE / totalLados) * 100) : 0;
         const percentLadoD = totalLados > 0 ? Math.round((countLadoD / totalLados) * 100) : 0;
         
-        // Atualizar DOM - Grupos
         document.getElementById('percent147').textContent = percent147 + '%';
         document.getElementById('count147').textContent = `${count147}/${total}`;
         document.getElementById('percent258').textContent = percent258 + '%';
         document.getElementById('count258').textContent = `${count258}/${total}`;
         document.getElementById('percent0369').textContent = percent0369 + '%';
         document.getElementById('count0369').textContent = `${count0369}/${total}`;
-        
-        // Atualizar DOM - Cima10/Baixo0
         document.getElementById('percentCima10').textContent = percentCima10 + '%';
         document.getElementById('countCima10').textContent = `${countCima10}/${total}`;
         document.getElementById('percentBaixo0').textContent = percentBaixo0 + '%';
         document.getElementById('countBaixo0').textContent = `${countBaixo0}/${total}`;
-        
-        // Atualizar DOM - Lado E/D
         document.getElementById('percentLadoE').textContent = percentLadoE + '%';
         document.getElementById('countLadoE').textContent = `${countLadoE}/${total}`;
         document.getElementById('percentLadoD').textContent = percentLadoD + '%';
@@ -1299,7 +1274,6 @@
         
         const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
         
-        // Zero
         const zeroRow = document.createElement('div');
         zeroRow.className = 'zero-row';
         const zeroBtn = document.createElement('div');
@@ -1309,7 +1283,6 @@
         zeroRow.appendChild(zeroBtn);
         tabela.appendChild(zeroRow);
         
-        // Linha 1
         const row1 = document.createElement('div');
         row1.className = 'numbers-row';
         [3,6,9,12,15,18,21,24,27,30,33,36].forEach(num => {
@@ -1321,7 +1294,6 @@
         });
         tabela.appendChild(row1);
         
-        // Linha 2
         const row2 = document.createElement('div');
         row2.className = 'numbers-row';
         [2,5,8,11,14,17,20,23,26,29,32,35].forEach(num => {
@@ -1333,7 +1305,6 @@
         });
         tabela.appendChild(row2);
         
-        // Linha 3
         const row3 = document.createElement('div');
         row3.className = 'numbers-row';
         [1,4,7,10,13,16,19,22,25,28,31,34].forEach(num => {
@@ -1355,7 +1326,6 @@
     function calcularProbabilidade(pattern) {
         let prob = 0;
         
-        // Pegar valores atuais
         const p147 = parseInt(document.getElementById('percent147')?.textContent || '0');
         const p258 = parseInt(document.getElementById('percent258')?.textContent || '0');
         const p0369 = parseInt(document.getElementById('percent0369')?.textContent || '0');
@@ -1364,42 +1334,31 @@
         const pLadoE = parseInt(document.getElementById('percentLadoE')?.textContent || '0');
         const pLadoD = parseInt(document.getElementById('percentLadoD')?.textContent || '0');
         
-        // 1. PADRÕES TERMINAIS
         if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
             const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
             
-            // Grupo (40%)
             let grupo = 0;
             if ([1,4,7].includes(terminal)) grupo = p147;
             else if ([2,5,8].includes(terminal)) grupo = p258;
             else if ([0,3,6,9].includes(terminal)) grupo = p0369;
             
-            // Lado Cima10/Baixo0 (30%)
             let lado = terminal <= 5 ? pCima10 : pBaixo0;
-            
-            // Setor Lado E/D (30%)
             let setor = terminal <= 5 ? pLadoD : pLadoE;
             
             prob = Math.round((grupo * 0.4) + (lado * 0.3) + (setor * 0.3));
         }
         
-        // 2. ALVO DUPLO
         else if (pattern.name === 'Alvo Duplo' && pattern.targetNumbers && pattern.targetNumbers[0]) {
             const targetNum = pattern.targetNumbers[0];
             
-            // Grupo do terminal (25%)
             let grupo = 0;
             if (GRUPO_147.includes(targetNum)) grupo = p147;
             else if (GRUPO_258.includes(targetNum)) grupo = p258;
             else if (GRUPO_0369.includes(targetNum)) grupo = p0369;
             
-            // Lado Cima10/Baixo0 (25%)
             let lado = CIMA_10.includes(targetNum) ? pCima10 : pBaixo0;
-            
-            // Setor Lado E/D (25%)
             let setor = LADO_E.includes(targetNum) ? pLadoE : pLadoD;
             
-            // Histórico do número (25%)
             const totalNumeros = numbersHistory.length;
             const countNumero = numbersHistory.filter(n => n === targetNum).length;
             const historico = totalNumeros > 0 ? Math.round((countNumero / totalNumeros) * 100) : 0;
@@ -1407,18 +1366,11 @@
             prob = Math.round((grupo * 0.25) + (lado * 0.25) + (setor * 0.25) + (historico * 0.25));
         }
         
-        // 3. ALVO GÊMEOS
         else if (pattern.name === 'Alvo Gêmeos') {
-            // Maior grupo (30%)
             const maiorGrupo = Math.max(p147, p258, p0369);
-            
-            // Lado Cima10 (20%) - todos no CIMA10
             const lado = pCima10;
-            
-            // Setor Lado D (30%) - todos no LADO D
             const setor = pLadoD;
             
-            // Histórico dos números (20%)
             let totalHistorico = 0;
             [11,22,33].forEach(num => {
                 totalHistorico += numbersHistory.filter(n => n === num).length;
@@ -1428,20 +1380,11 @@
             prob = Math.round((maiorGrupo * 0.3) + (lado * 0.2) + (setor * 0.3) + (historico * 0.2));
         }
         
-        // 4. ALVO TRIÂNGULO
         else if (pattern.name === 'Alvo Triângulo') {
-            // Maior grupo (25%)
             const maiorGrupo = Math.max(p147, p258, p0369);
-            
-            // Lado Cima10/Baixo0 (25%)
-            // 30 e 31 = CIMA10 | 32 = BAIXO0
             const lado = Math.round((pCima10 * 2 + pBaixo0) / 3);
-            
-            // Setor Lado E/D (25%)
-            // 30 e 32 = LADO E | 31 = LADO D
             const setor = Math.round((pLadoE * 2 + pLadoD) / 3);
             
-            // Histórico dos números (25%)
             let totalHistorico = 0;
             [30,31,32].forEach(num => {
                 totalHistorico += numbersHistory.filter(n => n === num).length;
@@ -1454,14 +1397,12 @@
         return Math.min(prob, 100);
     }
 
-    // ========== CLASSIFICAÇÃO DA PROBABILIDADE ==========
     function getClassificacao(prob) {
         if (prob >= 40) return { texto: 'TOP 🔥', classe: 'status-top' };
         if (prob >= 30) return { texto: 'BOM 📈', classe: 'status-bom' };
         return { texto: 'FRACO ⚠️', classe: 'status-fraco' };
     }
 
-    // ========== VERIFICA TERMINAL COM 3 NÚMEROS ==========
     function getTestesNecessarios(pattern) {
         if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
             const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
@@ -1582,45 +1523,51 @@
         });
         
         activePatterns = activePatterns.filter(pattern => 
-            pattern.status === 'active' && pattern.status !== 'cancelled' && pattern.status !== 'confirmed'
+            pattern.status === 'active'
         );
         
         checkForNewPatterns();
         checkMultipleConfirmations();
     }
 
+    // ========== FUNÇÃO CORRIGIDA - TESTES GREEN/RED ==========
     function checkConfirmedPatternResults(number) {
         confirmedPatterns.forEach((pattern, index) => {
             if (pattern.status === 'confirmed') {
+                // Verifica se é o número que confirmou - NÃO conta como teste
                 if (number === pattern.lastConfirmedNumber) {
                     console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
-                    return;
-                }
-                
-                pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
-                console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
-                
-                if (pattern.betNumbers.includes(number)) {
-                    pattern.status = 'green';
-                    pattern.finalResult = 'green';
-                    pattern.winningNumber = number;
-                    stats.greenSignals++;
-                    console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
+                    // APENAS LOG, CONTINUA O LOOP
+                } else {
+                    // Incrementa o contador de testes APENAS para números DIFERENTES do que confirmou
+                    pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
+                    console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                     
-                    completedPatterns.push(pattern);
-                    confirmedPatterns.splice(index, 1);
-                    
-                    if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                } else if (pattern.checkedNumbers >= 3) {
-                    pattern.status = 'red';
-                    pattern.finalResult = 'red';
-                    stats.redSignals++;
-                    console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
-                    
-                    completedPatterns.push(pattern);
-                    confirmedPatterns.splice(index, 1);
-                    
-                    if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
+                    // Verificar se acertou
+                    if (pattern.betNumbers.includes(number)) {
+                        pattern.status = 'green';
+                        pattern.finalResult = 'green';
+                        pattern.winningNumber = number;
+                        stats.greenSignals++;
+                        console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
+                        
+                        completedPatterns.push(pattern);
+                        confirmedPatterns.splice(index, 1);
+                        
+                        if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
+                    } 
+                    // Verificar se perdeu (3 testes sem acerto)
+                    else if (pattern.checkedNumbers >= 3) {
+                        pattern.status = 'red';
+                        pattern.finalResult = 'red';
+                        stats.redSignals++;
+                        console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
+                        
+                        completedPatterns.push(pattern);
+                        confirmedPatterns.splice(index, 1);
+                        
+                        if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
+                    }
                 }
             }
         });
