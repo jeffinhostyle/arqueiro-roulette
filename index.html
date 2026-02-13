@@ -85,7 +85,7 @@
             color: #FF7F7F;
         }
         
-        /* ========== SEU CSS ORIGINAL (TUDO ABAIXO É SEU) ========== */
+        /* ========== CSS ORIGINAL ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F4E4A6;
@@ -193,6 +193,155 @@
             font-size: 1.2rem;
         }
 
+        /* ========== PAINEL DE ESTATÍSTICAS - ALINHAMENTO PERFEITO ========== */
+        .stats-panel {
+            background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
+            border: 1px solid var(--gold);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stats-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--gold-dark);
+            text-align: center;
+        }
+
+        .stats-section {
+            margin-bottom: 20px;
+        }
+
+        .stats-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .stats-section-title {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        /* GRUPOS - 3 colunas perfeitamente distribuídas */
+        .stats-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* LADOS e SETORES - 2 colunas */
+        .stats-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .stat-group {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .stat-group-label {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .stat-group-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+        }
+
+        .stat-group-sub {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        .highlight-stat {
+            border: 1px solid var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        /* ========== TABELA DE NÚMEROS ========== */
+        .roulette-table {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+        
+        .zero-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .number-btn.zero {
+            width: 80px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--green), #228B22);
+            font-size: 1.5rem;
+        }
+        
+        .numbers-row {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 5px;
+        }
+        
+        .number-btn {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background: var(--darker-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px;
+        }
+
+        .number-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .number-btn.red {
+            background: linear-gradient(135deg, var(--red), #B22222);
+        }
+
+        .number-btn.black {
+            background: linear-gradient(135deg, #333, #111);
+        }
+
+        /* ========== SEU CSS ORIGINAL CONTINUA ========== */
         .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -368,7 +517,7 @@
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
         }
 
-        .stats-grid {
+        .stats-grid-5 {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 15px;
@@ -376,13 +525,13 @@
         }
 
         @media (max-width: 1200px) {
-            .stats-grid {
+            .stats-grid-5 {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .stats-grid {
+            .stats-grid-5 {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -495,16 +644,22 @@
             border: 1px solid var(--red);
         }
 
-        .status-green {
+        .status-fraco {
+            background-color: rgba(100, 100, 100, 0.2);
+            color: #CCCCCC;
+            border: 1px solid #666;
+        }
+
+        .status-bom {
+            background-color: rgba(212, 175, 55, 0.2);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .status-top {
             background-color: rgba(46, 139, 87, 0.3);
             color: var(--green);
             border: 1px solid var(--green);
-        }
-
-        .status-red {
-            background-color: rgba(220, 20, 60, 0.3);
-            color: var(--red);
-            border: 1px solid var(--red);
         }
 
         .pattern-details {
@@ -655,11 +810,15 @@
             .btn {
                 width: 100%;
             }
+            
+            .stats-grid-3 {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- SISTEMA DE ACESSO (APARECE PRIMEIRO) -->
+    <!-- SISTEMA DE ACESSO -->
     <div id="accessSystem" class="access-overlay">
         <div class="access-box">
             <h1 class="access-title">🎯 ARQUEIRO ROULETTE</h1>
@@ -679,7 +838,7 @@
         </div>
     </div>
     
-    <!-- SEU SISTEMA ORIGINAL (ESCONDIDO ATÉ LIBERAR ACESSO) -->
+    <!-- SISTEMA PRINCIPAL -->
     <div id="mainSystem" style="display: none;">
         <header class="main-header">
             <div class="brand">
@@ -694,6 +853,69 @@
             </div>
         </header>
 
+        <!-- PAINEL DE ESTATÍSTICAS - ALINHAMENTO PERFEITO -->
+        <div class="stats-panel">
+            <div class="stats-title">
+                <i>📊</i> ESTATÍSTICAS DO JOGO
+            </div>
+            
+            <!-- GRUPOS - 3 colunas igualmente distribuídas -->
+            <div class="stats-section">
+                <div class="stats-section-title">GRUPOS (1,4,7 | 2,5,8 | 0,3,6,9)</div>
+                <div class="stats-grid-3">
+                    <div class="stat-group" id="grupo147">
+                        <div class="stat-group-label"><i>🔴</i> 1,4,7</div>
+                        <div class="stat-group-value" id="percent147">0%</div>
+                        <div class="stat-group-sub" id="count147">0/0</div>
+                    </div>
+                    <div class="stat-group" id="grupo258">
+                        <div class="stat-group-label"><i>⚫</i> 2,5,8</div>
+                        <div class="stat-group-value" id="percent258">0%</div>
+                        <div class="stat-group-sub" id="count258">0/0</div>
+                    </div>
+                    <div class="stat-group" id="grupo0369">
+                        <div class="stat-group-label"><i>🟢</i> 0,3,6,9</div>
+                        <div class="stat-group-value" id="percent0369">0%</div>
+                        <div class="stat-group-sub" id="count0369">0/0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LADOS CIMA10/BAIXO0 - 2 colunas -->
+            <div class="stats-section">
+                <div class="stats-section-title">LADOS (CIMA 10 | BAIXO 0)</div>
+                <div class="stats-grid-2">
+                    <div class="stat-group" id="ladoCima10">
+                        <div class="stat-group-label"><i>⬆️</i> CIMA 10</div>
+                        <div class="stat-group-value" id="percentCima10">0%</div>
+                        <div class="stat-group-sub" id="countCima10">0/0</div>
+                    </div>
+                    <div class="stat-group" id="ladoBaixo0">
+                        <div class="stat-group-label"><i>⬇️</i> BAIXO 0</div>
+                        <div class="stat-group-value" id="percentBaixo0">0%</div>
+                        <div class="stat-group-sub" id="countBaixo0">0/0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SETORES LADO E/LADO D - 2 colunas -->
+            <div class="stats-section">
+                <div class="stats-section-title">SETORES (LADO E | LADO D)</div>
+                <div class="stats-grid-2">
+                    <div class="stat-group" id="ladoE">
+                        <div class="stat-group-label"><i>⬅️</i> LADO E</div>
+                        <div class="stat-group-value" id="percentLadoE">0%</div>
+                        <div class="stat-group-sub" id="countLadoE">0/0</div>
+                    </div>
+                    <div class="stat-group" id="ladoD">
+                        <div class="stat-group-label"><i>➡️</i> LADO D</div>
+                        <div class="stat-group-value" id="percentLadoD">0%</div>
+                        <div class="stat-group-sub" id="countLadoD">0/0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="container">
             <div>
                 <div class="panel">
@@ -701,16 +923,19 @@
                         <i>🎯</i> Entrada de Números
                     </div>
                     
+                    <!-- TABELA DE NÚMEROS -->
+                    <div class="roulette-table" id="numbersTable"></div>
+                    
                     <div class="input-section">
                         <div class="input-group">
                             <div class="number-input">
-                                <input type="number" id="numberInput" min="0" max="36" placeholder="Digite um número (0-36)">
+                                <input type="number" id="numberInput" min="0" max="36" placeholder="Ou digite o número">
                             </div>
                             <button class="btn btn-primary" id="addNumberBtn">
-                                <span>➕</span> Adicionar Número
+                                <span>➕</span> Adicionar
                             </button>
-                            <button class="btn btn-secondary" id="randomBtn">
-                                <span>🎲</span> Aleatório
+                            <button class="btn btn-secondary" id="clearLastBtn">
+                                <span>↩️</span> Apagar Último
                             </button>
                         </div>
                         
@@ -731,7 +956,7 @@
                         </div>
                     </div>
                     
-                    <div class="stats-grid">
+                    <div class="stats-grid-5">
                         <div class="stat-box">
                             <div class="stat-value" id="totalNumbers">0</div>
                             <div class="stat-label">Números Totais</div>
@@ -820,44 +1045,44 @@
                         <h3 style="color: var(--gold-light); margin-bottom: 15px;">Terminais (Último Dígito)</h3>
                         <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 15px;">
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 0</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">10, 20, 30</div>
+                                <div style="font-weight: bold; color: var(--gold);">T0</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">0,10,20,30</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 1</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">1, 11, 21, 31</div>
+                                <div style="font-weight: bold; color: var(--gold);">T1</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">1,11,21,31</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 2</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">2, 12, 22, 32</div>
+                                <div style="font-weight: bold; color: var(--gold);">T2</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">2,12,22,32</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 3</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">3, 13, 23, 33</div>
+                                <div style="font-weight: bold; color: var(--gold);">T3</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">3,13,23,33</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 4</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">4, 14, 24, 34</div>
+                                <div style="font-weight: bold; color: var(--gold);">T4</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">4,14,24,34</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 5</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">5, 15, 25, 35</div>
+                                <div style="font-weight: bold; color: var(--gold);">T5</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">5,15,25,35</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 6</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">6, 16, 26, 36</div>
+                                <div style="font-weight: bold; color: var(--gold);">T6</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">6,16,26,36</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 7</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">7, 17, 27</div>
+                                <div style="font-weight: bold; color: var(--gold);">T7</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">7,17,27</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 8</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">8, 18, 28</div>
+                                <div style="font-weight: bold; color: var(--gold);">T8</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">8,18,28</div>
                             </div>
                             <div style="text-align: center; padding: 12px; background-color: var(--darker-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <div style="font-weight: bold; color: var(--gold);">Terminal 9</div>
-                                <div style="font-size: 0.9rem; color: var(--text-dim);">9, 19, 29</div>
+                                <div style="font-weight: bold; color: var(--gold);">T9</div>
+                                <div style="font-size: 0.9rem; color: var(--text-dim);">9,19,29</div>
                             </div>
                         </div>
                     </div>
@@ -872,15 +1097,11 @@
 
     <script>
     // ========== SISTEMA DE ACESSO ==========
-    // VOCÊ EDITA APENAS ESTA LISTA!
     const EMAILS_AUTORIZADOS = [
-        "jeffinho.oliveira94@gmail.com",      // SEU EMAIL (TROQUE ISSO!)
-        "hugoalex719@gmail.com",       // CLIENTE 1
-        "rosejulio14012019@gmail.com",     // CLIENTE 2
-        "cliente3@yahoo.com.br",    // CLIENTE 3
-        // ADICIONE MAIS EMAILS AQUI ↓
-        // "novocliente@gmail.com",
-        // "outrocliente@email.com",
+        "jeffinho.oliveira94@gmail.com",
+        "hugoalex719@gmail.com",
+        "rosejulio14012019@gmail.com",
+        "cliente3@yahoo.com.br",
         "gabrieldirectpro@gmail.com",
         "Machadodias7254@gmail.com",
         "Jeissonbrambila@gmail.com",
@@ -892,13 +1113,11 @@
         "valsenirsouza@gmail.com",
         "andreluizsb94@gmail.com"
     ];
-    // ========== FIM DA LISTA EDITÁVEL ==========
 
     function verificarAcesso() {
         const email = document.getElementById('accessEmail').value.trim().toLowerCase();
         const message = document.getElementById('accessMessage');
         
-        // Limpar mensagem anterior
         message.innerHTML = '';
         message.className = 'access-message';
         
@@ -908,69 +1127,355 @@
             return;
         }
         
-        // Verificar se o email está na lista
         const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
         
         if (lista.includes(email)) {
-            // Acesso permitido
             localStorage.setItem('arqueiro_acesso', email);
-            
             message.innerHTML = '✅ Acesso autorizado! Entrando no sistema...';
             message.className = 'access-message access-success';
             
-            // Mostrar sistema após 1 segundo
             setTimeout(function() {
                 document.getElementById('accessSystem').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
+                inicializarSistema();
             }, 1000);
-            
         } else {
             message.innerHTML = '❌ Email não autorizado.<br><br>Entre em contato para solicitar acesso.';
             message.className = 'access-message access-error';
         }
     }
     
-    // Verificar se já tem acesso salvo
     document.addEventListener('DOMContentLoaded', function() {
         const emailSalvo = localStorage.getItem('arqueiro_acesso');
         
         if (emailSalvo) {
             const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
-            
             if (lista.includes(emailSalvo.toLowerCase())) {
-                // Já está logado e autorizado
                 document.getElementById('accessSystem').style.display = 'none';
                 document.getElementById('mainSystem').style.display = 'block';
+                inicializarSistema();
                 return;
             } else {
-                // Email não está mais na lista
                 localStorage.removeItem('arqueiro_acesso');
             }
         }
         
-        // Se chegou aqui, mostrar tela de acesso
         document.getElementById('accessSystem').style.display = 'flex';
         document.getElementById('mainSystem').style.display = 'none';
-        
-        // Focar no campo de email
         document.getElementById('accessEmail').focus();
-        
-        // Permitir Enter para enviar
         document.getElementById('accessEmail').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                verificarAcesso();
-            }
+            if (e.key === 'Enter') verificarAcesso();
         });
     });
 
-    // ========== SEU CÓDIGO ORIGINAL DA ROLETA ==========
-    // Dados da roleta europeia
-    const wheelSequence = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    // ========== ESTATÍSTICAS COMPLETAS ==========
+    const GRUPO_147 = [1,4,7,10,13,16,19,22,25,28,31,34];
+    const GRUPO_258 = [2,5,8,11,14,17,20,23,26,29,32,35];
+    const GRUPO_0369 = [0,3,6,9,12,15,18,21,24,27,30,33,36];
     
-    // Números vermelhos na roleta europeia
+    const CIMA_10 = [10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26, 0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23];
+    const BAIXO_0 = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    
+    const LADO_E = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10];
+    const LADO_D = [5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+
+    function atualizarEstatisticas() {
+        if (numbersHistory.length === 0) {
+            // Grupos
+            document.getElementById('percent147').textContent = '0%';
+            document.getElementById('count147').textContent = '0/0';
+            document.getElementById('percent258').textContent = '0%';
+            document.getElementById('count258').textContent = '0/0';
+            document.getElementById('percent0369').textContent = '0%';
+            document.getElementById('count0369').textContent = '0/0';
+            
+            // Lados Cima10/Baixo0
+            document.getElementById('percentCima10').textContent = '0%';
+            document.getElementById('countCima10').textContent = '0/0';
+            document.getElementById('percentBaixo0').textContent = '0%';
+            document.getElementById('countBaixo0').textContent = '0/0';
+            
+            // Lados E/D
+            document.getElementById('percentLadoE').textContent = '0%';
+            document.getElementById('countLadoE').textContent = '0/0';
+            document.getElementById('percentLadoD').textContent = '0%';
+            document.getElementById('countLadoD').textContent = '0/0';
+            return;
+        }
+        
+        const total = numbersHistory.length;
+        
+        // Contagem GRUPOS
+        let count147 = 0, count258 = 0, count0369 = 0;
+        
+        // Contagem CIMA10/BAIXO0
+        let countCima10 = 0, countBaixo0 = 0;
+        
+        // Contagem LADO E/LADO D
+        let countLadoE = 0, countLadoD = 0;
+        
+        numbersHistory.forEach(num => {
+            // Grupos
+            if (GRUPO_147.includes(num)) count147++;
+            if (GRUPO_258.includes(num)) count258++;
+            if (GRUPO_0369.includes(num)) count0369++;
+            
+            // Cima10/Baixo0
+            if (CIMA_10.includes(num)) countCima10++;
+            if (BAIXO_0.includes(num)) countBaixo0++;
+            
+            // Lado E/D
+            if (LADO_E.includes(num)) countLadoE++;
+            if (LADO_D.includes(num)) countLadoD++;
+        });
+        
+        // Percentuais GRUPOS (soma 100%)
+        const totalGrupos = count147 + count258 + count0369;
+        const percent147 = totalGrupos > 0 ? Math.round((count147 / totalGrupos) * 100) : 0;
+        const percent258 = totalGrupos > 0 ? Math.round((count258 / totalGrupos) * 100) : 0;
+        const percent0369 = totalGrupos > 0 ? Math.round((count0369 / totalGrupos) * 100) : 0;
+        
+        // Percentuais CIMA10/BAIXO0 (soma 100%)
+        const totalCimaBaixo = countCima10 + countBaixo0;
+        const percentCima10 = totalCimaBaixo > 0 ? Math.round((countCima10 / totalCimaBaixo) * 100) : 0;
+        const percentBaixo0 = totalCimaBaixo > 0 ? Math.round((countBaixo0 / totalCimaBaixo) * 100) : 0;
+        
+        // Percentuais LADO E/LADO D (soma 100%)
+        const totalLados = countLadoE + countLadoD;
+        const percentLadoE = totalLados > 0 ? Math.round((countLadoE / totalLados) * 100) : 0;
+        const percentLadoD = totalLados > 0 ? Math.round((countLadoD / totalLados) * 100) : 0;
+        
+        // Atualizar DOM - Grupos
+        document.getElementById('percent147').textContent = percent147 + '%';
+        document.getElementById('count147').textContent = `${count147}/${total}`;
+        document.getElementById('percent258').textContent = percent258 + '%';
+        document.getElementById('count258').textContent = `${count258}/${total}`;
+        document.getElementById('percent0369').textContent = percent0369 + '%';
+        document.getElementById('count0369').textContent = `${count0369}/${total}`;
+        
+        // Atualizar DOM - Cima10/Baixo0
+        document.getElementById('percentCima10').textContent = percentCima10 + '%';
+        document.getElementById('countCima10').textContent = `${countCima10}/${total}`;
+        document.getElementById('percentBaixo0').textContent = percentBaixo0 + '%';
+        document.getElementById('countBaixo0').textContent = `${countBaixo0}/${total}`;
+        
+        // Atualizar DOM - Lado E/D
+        document.getElementById('percentLadoE').textContent = percentLadoE + '%';
+        document.getElementById('countLadoE').textContent = `${countLadoE}/${total}`;
+        document.getElementById('percentLadoD').textContent = percentLadoD + '%';
+        document.getElementById('countLadoD').textContent = `${countLadoD}/${total}`;
+        
+        destacarMaiorPercentual();
+    }
+
+    function destacarMaiorPercentual() {
+        document.querySelectorAll('.stat-group').forEach(el => {
+            el.classList.remove('highlight-stat');
+        });
+        
+        const percents = [
+            { id: 'grupo147', value: parseInt(document.getElementById('percent147').textContent) },
+            { id: 'grupo258', value: parseInt(document.getElementById('percent258').textContent) },
+            { id: 'grupo0369', value: parseInt(document.getElementById('percent0369').textContent) },
+            { id: 'ladoCima10', value: parseInt(document.getElementById('percentCima10').textContent) },
+            { id: 'ladoBaixo0', value: parseInt(document.getElementById('percentBaixo0').textContent) },
+            { id: 'ladoE', value: parseInt(document.getElementById('percentLadoE').textContent) },
+            { id: 'ladoD', value: parseInt(document.getElementById('percentLadoD').textContent) }
+        ];
+        
+        const maior = Math.max(...percents.map(p => p.value));
+        
+        percents.forEach(p => {
+            if (p.value === maior && p.value > 0) {
+                document.getElementById(p.id).classList.add('highlight-stat');
+            }
+        });
+    }
+
+    // ========== TABELA DE NÚMEROS ==========
+    function criarTabelaNumeros() {
+        const tabela = document.getElementById('numbersTable');
+        tabela.innerHTML = '';
+        
+        const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
+        
+        // Zero
+        const zeroRow = document.createElement('div');
+        zeroRow.className = 'zero-row';
+        const zeroBtn = document.createElement('div');
+        zeroBtn.className = 'number-btn zero';
+        zeroBtn.textContent = '0';
+        zeroBtn.onclick = () => adicionarNumeroClicado(0);
+        zeroRow.appendChild(zeroBtn);
+        tabela.appendChild(zeroRow);
+        
+        // Linha 1
+        const row1 = document.createElement('div');
+        row1.className = 'numbers-row';
+        [3,6,9,12,15,18,21,24,27,30,33,36].forEach(num => {
+            const btn = document.createElement('div');
+            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
+            btn.textContent = num;
+            btn.onclick = () => adicionarNumeroClicado(num);
+            row1.appendChild(btn);
+        });
+        tabela.appendChild(row1);
+        
+        // Linha 2
+        const row2 = document.createElement('div');
+        row2.className = 'numbers-row';
+        [2,5,8,11,14,17,20,23,26,29,32,35].forEach(num => {
+            const btn = document.createElement('div');
+            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
+            btn.textContent = num;
+            btn.onclick = () => adicionarNumeroClicado(num);
+            row2.appendChild(btn);
+        });
+        tabela.appendChild(row2);
+        
+        // Linha 3
+        const row3 = document.createElement('div');
+        row3.className = 'numbers-row';
+        [1,4,7,10,13,16,19,22,25,28,31,34].forEach(num => {
+            const btn = document.createElement('div');
+            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
+            btn.textContent = num;
+            btn.onclick = () => adicionarNumeroClicado(num);
+            row3.appendChild(btn);
+        });
+        tabela.appendChild(row3);
+    }
+
+    function adicionarNumeroClicado(numero) {
+        document.getElementById('numberInput').value = numero;
+        addNumber();
+    }
+
+    // ========== FUNÇÃO DE PROBABILIDADE ÚNICA ==========
+    function calcularProbabilidade(pattern) {
+        let prob = 0;
+        
+        // Pegar valores atuais
+        const p147 = parseInt(document.getElementById('percent147')?.textContent || '0');
+        const p258 = parseInt(document.getElementById('percent258')?.textContent || '0');
+        const p0369 = parseInt(document.getElementById('percent0369')?.textContent || '0');
+        const pCima10 = parseInt(document.getElementById('percentCima10')?.textContent || '0');
+        const pBaixo0 = parseInt(document.getElementById('percentBaixo0')?.textContent || '0');
+        const pLadoE = parseInt(document.getElementById('percentLadoE')?.textContent || '0');
+        const pLadoD = parseInt(document.getElementById('percentLadoD')?.textContent || '0');
+        
+        // 1. PADRÕES TERMINAIS
+        if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
+            const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
+            
+            // Grupo (40%)
+            let grupo = 0;
+            if ([1,4,7].includes(terminal)) grupo = p147;
+            else if ([2,5,8].includes(terminal)) grupo = p258;
+            else if ([0,3,6,9].includes(terminal)) grupo = p0369;
+            
+            // Lado Cima10/Baixo0 (30%)
+            let lado = terminal <= 5 ? pCima10 : pBaixo0;
+            
+            // Setor Lado E/D (30%)
+            let setor = terminal <= 5 ? pLadoD : pLadoE;
+            
+            prob = Math.round((grupo * 0.4) + (lado * 0.3) + (setor * 0.3));
+        }
+        
+        // 2. ALVO DUPLO
+        else if (pattern.name === 'Alvo Duplo' && pattern.targetNumbers && pattern.targetNumbers[0]) {
+            const targetNum = pattern.targetNumbers[0];
+            
+            // Grupo do terminal (25%)
+            let grupo = 0;
+            if (GRUPO_147.includes(targetNum)) grupo = p147;
+            else if (GRUPO_258.includes(targetNum)) grupo = p258;
+            else if (GRUPO_0369.includes(targetNum)) grupo = p0369;
+            
+            // Lado Cima10/Baixo0 (25%)
+            let lado = CIMA_10.includes(targetNum) ? pCima10 : pBaixo0;
+            
+            // Setor Lado E/D (25%)
+            let setor = LADO_E.includes(targetNum) ? pLadoE : pLadoD;
+            
+            // Histórico do número (25%)
+            const totalNumeros = numbersHistory.length;
+            const countNumero = numbersHistory.filter(n => n === targetNum).length;
+            const historico = totalNumeros > 0 ? Math.round((countNumero / totalNumeros) * 100) : 0;
+            
+            prob = Math.round((grupo * 0.25) + (lado * 0.25) + (setor * 0.25) + (historico * 0.25));
+        }
+        
+        // 3. ALVO GÊMEOS
+        else if (pattern.name === 'Alvo Gêmeos') {
+            // Maior grupo (30%)
+            const maiorGrupo = Math.max(p147, p258, p0369);
+            
+            // Lado Cima10 (20%) - todos no CIMA10
+            const lado = pCima10;
+            
+            // Setor Lado D (30%) - todos no LADO D
+            const setor = pLadoD;
+            
+            // Histórico dos números (20%)
+            let totalHistorico = 0;
+            [11,22,33].forEach(num => {
+                totalHistorico += numbersHistory.filter(n => n === num).length;
+            });
+            const historico = numbersHistory.length > 0 ? Math.round((totalHistorico / numbersHistory.length) * 100) : 0;
+            
+            prob = Math.round((maiorGrupo * 0.3) + (lado * 0.2) + (setor * 0.3) + (historico * 0.2));
+        }
+        
+        // 4. ALVO TRIÂNGULO
+        else if (pattern.name === 'Alvo Triângulo') {
+            // Maior grupo (25%)
+            const maiorGrupo = Math.max(p147, p258, p0369);
+            
+            // Lado Cima10/Baixo0 (25%)
+            // 30 e 31 = CIMA10 | 32 = BAIXO0
+            const lado = Math.round((pCima10 * 2 + pBaixo0) / 3);
+            
+            // Setor Lado E/D (25%)
+            // 30 e 32 = LADO E | 31 = LADO D
+            const setor = Math.round((pLadoE * 2 + pLadoD) / 3);
+            
+            // Histórico dos números (25%)
+            let totalHistorico = 0;
+            [30,31,32].forEach(num => {
+                totalHistorico += numbersHistory.filter(n => n === num).length;
+            });
+            const historico = numbersHistory.length > 0 ? Math.round((totalHistorico / numbersHistory.length) * 100) : 0;
+            
+            prob = Math.round((maiorGrupo * 0.25) + (lado * 0.25) + (setor * 0.25) + (historico * 0.25));
+        }
+        
+        return Math.min(prob, 100);
+    }
+
+    // ========== CLASSIFICAÇÃO DA PROBABILIDADE ==========
+    function getClassificacao(prob) {
+        if (prob >= 40) return { texto: 'TOP 🔥', classe: 'status-top' };
+        if (prob >= 30) return { texto: 'BOM 📈', classe: 'status-bom' };
+        return { texto: 'FRACO ⚠️', classe: 'status-fraco' };
+    }
+
+    // ========== VERIFICA TERMINAL COM 3 NÚMEROS ==========
+    function getTestesNecessarios(pattern) {
+        if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
+            const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
+            if ([7,8,9].includes(terminal)) {
+                return 5;
+            }
+        }
+        return 3;
+    }
+
+    // ========== SEU CÓDIGO ORIGINAL DA ROLETA ==========
+    const wheelSequence = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
     const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
     
-    // Estado da aplicação
     let numbersHistory = [];
     let activePatterns = [];
     let confirmedPatterns = [];
@@ -983,35 +1488,31 @@
         greenSignals: 0,
         redSignals: 0
     };
-
     let multipleConfirmationsBlock = false;
 
-    // Inicialização DO SEU SISTEMA (só roda quando acesso for liberado)
-    document.addEventListener('DOMContentLoaded', function() {
-        // Só inicializa se o sistema principal estiver visível
-        if (document.getElementById('mainSystem').style.display === 'block') {
-            loadFromLocalStorage();
-            updateDisplay();
-            
-            document.getElementById('addNumberBtn').addEventListener('click', addNumber);
-            document.getElementById('numberInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') addNumber();
+    function inicializarSistema() {
+        criarTabelaNumeros();
+        loadFromLocalStorage();
+        updateDisplay();
+        
+        document.getElementById('addNumberBtn').addEventListener('click', addNumber);
+        document.getElementById('numberInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addNumber();
+        });
+        document.getElementById('clearLastBtn').addEventListener('click', clearLastNumber);
+        document.getElementById('clearBtn').addEventListener('click', clearHistory);
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
             });
-            document.getElementById('randomBtn').addEventListener('click', addRandomNumber);
-            document.getElementById('clearBtn').addEventListener('click', clearHistory);
-            document.getElementById('resetBtn').addEventListener('click', resetAll);
-            
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-        }
-    });
+        });
+    }
 
     function addNumber() {
         const input = document.getElementById('numberInput');
@@ -1034,20 +1535,21 @@
         saveToLocalStorage();
     }
 
-    function addRandomNumber() {
-        const randomNumber = Math.floor(Math.random() * 37);
-        document.getElementById('numberInput').value = randomNumber;
-        addNumber();
+    function clearLastNumber() {
+        if (numbersHistory.length > 0) {
+            const removed = numbersHistory.pop();
+            stats.totalNumbers--;
+            console.log(`↩️ Número ${removed} removido`);
+            updateDisplay();
+            saveToLocalStorage();
+        }
     }
 
-    // FUNÇÃO PRINCIPAL CORRIGIDA
     function processNewNumber(number) {
         console.log(`=== PROCESSANDO NÚMERO ${number} ===`);
         
-        // 1. Primeiro verificar resultados de padrões já confirmados
         checkConfirmedPatternResults(number);
         
-        // 2. Verificar cancelamento de padrões ativos
         activePatterns.forEach(pattern => {
             if (pattern.status === 'active' && pattern.cancellationSet.includes(number)) {
                 pattern.status = 'cancelled';
@@ -1057,15 +1559,15 @@
             }
         });
         
-        // 3. Atualizar confirmações de padrões ativos NÃO cancelados
         activePatterns.forEach(pattern => {
             if (pattern.status === 'active') {
                 if (!pattern.cancellationSet.includes(number)) {
                     pattern.confirmationCount++;
-                    console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/5`);
                     
-                    // ALTERAÇÃO AQUI: de 3 para 5
-                    if (pattern.confirmationCount >= 5) {
+                    const testesNecessarios = getTestesNecessarios(pattern);
+                    console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/${testesNecessarios}`);
+                    
+                    if (pattern.confirmationCount >= testesNecessarios) {
                         pattern.status = 'confirmed';
                         pattern.confirmedAt = numbersHistory.length;
                         pattern.checkedNumbers = 0;
@@ -1079,62 +1581,46 @@
             }
         });
         
-        // CORREÇÃO: Remover padrões cancelados e confirmados dos ativos
         activePatterns = activePatterns.filter(pattern => 
             pattern.status === 'active' && pattern.status !== 'cancelled' && pattern.status !== 'confirmed'
         );
         
-        // 4. Verificar novos padrões
         checkForNewPatterns();
-        
-        // 5. Verificar múltiplos confirmados
         checkMultipleConfirmations();
     }
 
-    // FUNÇÃO CORRIGIDA - Testes GREEN/RED começam após confirmação
     function checkConfirmedPatternResults(number) {
         confirmedPatterns.forEach((pattern, index) => {
             if (pattern.status === 'confirmed') {
-                // NÃO incrementar se este é o número que confirmou
                 if (number === pattern.lastConfirmedNumber) {
                     console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
                     return;
                 }
                 
-                // Só conta como teste se NÃO for o número que confirmou
                 pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
-                
                 console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                 
-                // Verificar se saiu algum número que paga
                 if (pattern.betNumbers.includes(number)) {
                     pattern.status = 'green';
                     pattern.finalResult = 'green';
                     pattern.winningNumber = number;
                     stats.greenSignals++;
-                    
                     console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
                     
                     completedPatterns.push(pattern);
                     confirmedPatterns.splice(index, 1);
                     
-                    if (multipleConfirmationsBlock) {
-                        multipleConfirmationsBlock = false;
-                    }
-                } 
-                else if (pattern.checkedNumbers >= 3) {
+                    if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
+                } else if (pattern.checkedNumbers >= 3) {
                     pattern.status = 'red';
                     pattern.finalResult = 'red';
                     stats.redSignals++;
-                    
                     console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
                     
                     completedPatterns.push(pattern);
                     confirmedPatterns.splice(index, 1);
                     
-                    if (multipleConfirmationsBlock) {
-                        multipleConfirmationsBlock = false;
-                    }
+                    if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
                 }
             }
         });
@@ -1145,7 +1631,6 @@
             console.log("⚠️ MÚLTIPLOS CONFIRMADOS DETECTADOS!");
             multipleConfirmationsBlock = true;
         }
-        
         if (confirmedPatterns.length <= 1 && multipleConfirmationsBlock) {
             multipleConfirmationsBlock = false;
         }
@@ -1153,7 +1638,6 @@
 
     function checkForNewPatterns() {
         if (numbersHistory.length < 2) return;
-        
         if (multipleConfirmationsBlock) {
             console.log("🚫 Bloqueio ativo: não criando novos padrões");
             return;
@@ -1165,7 +1649,6 @@
         
         console.log(`🔍 Verificando padrões entre: ${lastNumber} e ${currentNumber}`);
         
-        // Estratégia 1: Alvo Duplo - 3 vizinhos = 6V
         if (currentNumber === lastNumber && currentNumber !== 36) {
             const target = (currentNumber + 1) % 37;
             const neighbors = getNeighborsInWheel(target, 3);
@@ -1195,7 +1678,6 @@
             }
         }
         
-        // Estratégia 2: Alvo Alternado
         const lastTerminal = lastNumber % 10;
         const currentTerminal = currentNumber % 10;
         
@@ -1204,33 +1686,27 @@
             createTerminalPattern('Alvo Alternado', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
         
-        // Estratégia 3: Alvo Variável
         const diff = Math.abs(currentTerminal - lastTerminal);
         if (diff === 1) {
             const isAscending = currentTerminal > lastTerminal;
             let targetTerminal;
-            
             if (isAscending) {
                 targetTerminal = (currentTerminal + 1) % 10;
             } else {
                 targetTerminal = (Math.min(currentTerminal, lastTerminal) - 1 + 10) % 10;
             }
-            
             createTerminalPattern('Alvo Variável', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
         
-        // Estratégia 4: Alvo Central
         if (diff === 2) {
             const targetTerminal = Math.min(currentTerminal, lastTerminal) + 1;
             createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
         }
         
-        // Estratégia 5: Alvo Gêmeos - 2V
         if ([11, 22, 33].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
         }
         
-        // Estratégia 6: Alvo Triângulo - 2V
         if ([30, 31, 32].includes(currentNumber)) {
             createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
         }
@@ -1279,7 +1755,6 @@
         
         const cancellationSet = [...targetNumbers, ...neighbors];
         const betNumbers = [...targetNumbers, ...neighbors];
-        
         const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
         
         const pattern = {
@@ -1311,33 +1786,23 @@
             pattern.trigger === newPattern.trigger &&
             pattern.status === 'active'
         );
-        
         const isConfirmedDuplicate = confirmedPatterns.some(pattern =>
             pattern.strategy === newPattern.strategy &&
             pattern.trigger === newPattern.trigger
         );
-        
         return isActiveDuplicate || isConfirmedDuplicate;
     }
 
     function getNeighborsInWheel(number, count) {
         const index = wheelSequence.indexOf(number);
-        
-        if (index === -1) {
-            console.error(`Número ${number} não encontrado na sequência da roda!`);
-            return [];
-        }
-        
+        if (index === -1) return [];
         const neighbors = [];
-        
         for (let i = 1; i <= count; i++) {
             const aboveIndex = (index - i + wheelSequence.length) % wheelSequence.length;
             neighbors.push(wheelSequence[aboveIndex]);
-            
             const belowIndex = (index + i) % wheelSequence.length;
             neighbors.push(wheelSequence[belowIndex]);
         }
-        
         return neighbors;
     }
 
@@ -1366,10 +1831,8 @@
                 const chip = document.createElement('div');
                 chip.className = `number-chip ${num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black'} ${isLatest ? 'latest' : ''}`;
                 chip.textContent = num;
-                
                 const position = numbersHistory.length - index;
                 chip.title = `Posição: ${position}${isLatest ? ' (Último)' : ''}`;
-                
                 numbersHistoryElement.appendChild(chip);
             });
         }
@@ -1387,9 +1850,10 @@
             confirmedPatterns.forEach(pattern => {
                 const panel = document.createElement('div');
                 panel.className = 'panel confirmed-highlight';
-                
                 const numbersSinceConfirmation = pattern.checkedNumbers || 0;
-                const remainingNumbers = Math.max(0, 3 - numbersSinceConfirmation);
+                
+                const prob = calcularProbabilidade(pattern);
+                const classificacao = getClassificacao(prob);
                 
                 panel.innerHTML = `
                     <div class="panel-title">
@@ -1401,6 +1865,9 @@
                     </div>
                     <div class="pattern-details"><strong>Gatilho:</strong> ${pattern.trigger}</div>
                     <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
+                    <div class="pattern-status ${classificacao.classe}" style="margin: 10px 0; font-size: 1rem;">
+                        ${classificacao.texto} ${prob}%
+                    </div>
                     <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${pattern.betSize} números</div>
                     <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${numbersSinceConfirmation}/3</div>
                     <div class="pattern-details"><strong>Números para apostar:</strong></div>
@@ -1412,7 +1879,6 @@
                         }).join('')}
                     </div>
                 `;
-                
                 confirmedHighlight.appendChild(panel);
             });
         }
@@ -1420,7 +1886,6 @@
         const activePatternsList = document.getElementById('activePatternsList');
         activePatternsList.innerHTML = '';
         
-        // CORREÇÃO: Mostrar apenas padrões ATIVOS (não cancelados)
         const activePatternsFiltered = activePatterns.filter(pattern => pattern.status === 'active');
         
         if (activePatternsFiltered.length === 0) {
@@ -1430,7 +1895,10 @@
                 const patternCard = document.createElement('div');
                 patternCard.className = 'pattern-card';
                 
-                // ALTERAÇÃO AQUI: de 3 para 5
+                const prob = calcularProbabilidade(pattern);
+                const classificacao = getClassificacao(prob);
+                const testesNecessarios = getTestesNecessarios(pattern);
+                
                 patternCard.innerHTML = `
                     <div class="pattern-header">
                         <div class="pattern-title">${pattern.name}</div>
@@ -1438,12 +1906,17 @@
                     </div>
                     <div class="pattern-details">Gatilho: ${pattern.trigger}</div>
                     <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                    <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/5</div>
+                    <div class="pattern-status ${classificacao.classe}" style="margin: 10px 0;">
+                        ${classificacao.texto} ${prob}%
+                    </div>
+                    <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/${testesNecessarios}</div>
                 `;
                 
                 activePatternsList.appendChild(patternCard);
             });
         }
+        
+        atualizarEstatisticas();
     }
 
     function clearHistory() {
@@ -1470,7 +1943,6 @@
                 greenSignals: 0,
                 redSignals: 0
             };
-            
             updateDisplay();
             localStorage.removeItem('arqueiroRouletteData');
         }
@@ -1482,13 +1954,11 @@
             stats,
             version: 'FINAL_COMPLETO'
         };
-        
         localStorage.setItem('arqueiroRouletteData', JSON.stringify(data));
     }
 
     function loadFromLocalStorage() {
         const savedData = localStorage.getItem('arqueiroRouletteData');
-        
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
@@ -1501,16 +1971,13 @@
                     greenSignals: 0,
                     redSignals: 0
                 };
-                
                 activePatterns = [];
                 confirmedPatterns = [];
                 completedPatterns = [];
                 multipleConfirmationsBlock = false;
                 
                 numbersHistory.forEach((num, index) => {
-                    if (index > 0) {
-                        processNewNumber(num);
-                    }
+                    if (index > 0) processNewNumber(num);
                 });
             } catch (e) {
                 console.error("Erro ao carregar dados salvos:", e);
