@@ -947,7 +947,7 @@
                         </div>
                     </div>
                     
-                    <h3 style="margin-top: 25px; color: var(--gold-light);">Histórico de Números</h3>
+                    <h3 style="margin-top: 25px; color: var(--gold-light);">Histórico de Números (últimos 16)</h3>
                     <div class="numbers-history" id="numbersHistory">
                         <div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">
                             Nenhum número adicionado ainda
@@ -1537,13 +1537,11 @@
                 // Verifica se é o número que confirmou - NÃO conta como teste
                 if (number === pattern.lastConfirmedNumber) {
                     console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
-                    // APENAS LOG, CONTINUA O LOOP
                 } else {
                     // Incrementa o contador de testes APENAS para números DIFERENTES do que confirmou
                     pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
                     console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                     
-                    // Verificar se acertou
                     if (pattern.betNumbers.includes(number)) {
                         pattern.status = 'green';
                         pattern.finalResult = 'green';
@@ -1555,9 +1553,7 @@
                         confirmedPatterns.splice(index, 1);
                         
                         if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                    } 
-                    // Verificar se perdeu (3 testes sem acerto)
-                    else if (pattern.checkedNumbers >= 3) {
+                    } else if (pattern.checkedNumbers >= 3) {
                         pattern.status = 'red';
                         pattern.finalResult = 'red';
                         stats.redSignals++;
@@ -1773,7 +1769,8 @@
         if (numbersHistory.length === 0) {
             numbersHistoryElement.innerHTML = '<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';
         } else {
-            numbersHistory.slice().reverse().forEach((num, index) => {
+            // MOSTRA APENAS OS ÚLTIMOS 16 NÚMEROS
+            numbersHistory.slice(-16).reverse().forEach((num, index) => {
                 const isLatest = index === 0;
                 const chip = document.createElement('div');
                 chip.className = `number-chip ${num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black'} ${isLatest ? 'latest' : ''}`;
