@@ -1476,11 +1476,24 @@
         saveToLocalStorage();
     }
 
+    // ========== CORREÇÃO 1: APAGAR PADRÕES JUNTO COM O NÚMERO ==========
     function clearLastNumber() {
         if (numbersHistory.length > 0) {
             const removed = numbersHistory.pop();
             stats.totalNumbers--;
-            console.log(`↩️ Número ${removed} removido`);
+            
+            // REMOVER TODOS OS PADRÕES QUE FORAM CRIADOS POR ESTE NÚMERO
+            const beforeCount = activePatterns.length;
+            activePatterns = activePatterns.filter(pattern => {
+                // Verifica se o gatilho contém o número removido
+                if (pattern.trigger && pattern.trigger.includes(removed.toString())) {
+                    console.log(`🗑️ Padrão ${pattern.name} removido (gatilho: ${pattern.trigger})`);
+                    return false;
+                }
+                return true;
+            });
+            
+            console.log(`↩️ Número ${removed} removido. ${activePatterns.length} padrões ativos restantes (removidos ${beforeCount - activePatterns.length})`);
             updateDisplay();
             saveToLocalStorage();
         }
@@ -1530,18 +1543,23 @@
         checkMultipleConfirmations();
     }
 
-    // ========== FUNÇÃO CORRIGIDA - TESTES GREEN/RED ==========
+    // ========== CORREÇÃO 2: PAGAR TODOS OS PADRÕES QUE ACERTAREM ==========
     function checkConfirmedPatternResults(number) {
-        confirmedPatterns.forEach((pattern, index) => {
+        // Processar TODOS os padrões confirmados, sem remover durante o loop
+        const patternsToProcess = [...confirmedPatterns];
+        let removedIndices = [];
+        
+        patternsToProcess.forEach((pattern, processIndex) => {
             if (pattern.status === 'confirmed') {
                 // Verifica se é o número que confirmou - NÃO conta como teste
                 if (number === pattern.lastConfirmedNumber) {
                     console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
                 } else {
-                    // Incrementa o contador de testes APENAS para números DIFERENTES do que confirmou
+                    // Incrementa o contador de testes
                     pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
                     console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
                     
+                    // Verifica se acertou - PAGA TODOS QUE ACERTAREM
                     if (pattern.betNumbers.includes(number)) {
                         pattern.status = 'green';
                         pattern.finalResult = 'green';
@@ -1549,24 +1567,36 @@
                         stats.greenSignals++;
                         console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
                         
-                        completedPatterns.push(pattern);
-                        confirmedPatterns.splice(index, 1);
+                        // Marca para remoção
+                        const originalIndex = confirmedPatterns.indexOf(pattern);
+                        if (originalIndex !== -1) removedIndices.push(originalIndex);
                         
                         if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                    } else if (pattern.checkedNumbers >= 3) {
+                    } 
+                    // Verifica se perdeu (3 testes sem acerto)
+                    else if (pattern.checkedNumbers >= 3) {
                         pattern.status = 'red';
                         pattern.finalResult = 'red';
                         stats.redSignals++;
                         console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
                         
-                        completedPatterns.push(pattern);
-                        confirmedPatterns.splice(index, 1);
+                        // Marca para remoção
+                        const originalIndex = confirmedPatterns.indexOf(pattern);
+                        if (originalIndex !== -1) removedIndices.push(originalIndex);
                         
                         if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
                     }
                 }
             }
         });
+        
+        // Remove os padrões processados (do maior índice para o menor)
+        if (removedIndices.length > 0) {
+            removedIndices.sort((a, b) => b - a).forEach(index => {
+                const removed = confirmedPatterns.splice(index, 1)[0];
+                completedPatterns.push(removed);
+            });
+        }
     }
 
     function checkMultipleConfirmations() {
@@ -1769,7 +1799,6 @@
         if (numbersHistory.length === 0) {
             numbersHistoryElement.innerHTML = '<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';
         } else {
-            // MOSTRA APENAS OS ÚLTIMOS 16 NÚMEROS
             numbersHistory.slice(-16).reverse().forEach((num, index) => {
                 const isLatest = index === 0;
                 const chip = document.createElement('div');
