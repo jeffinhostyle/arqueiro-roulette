@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARQUEIRO ROULETTE - Sistema Final</title>
+    
+    <!-- FIREBASE - MANTIDO -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        /* ========== ESTILO DO SISTEMA DE ACESSO ========== */
+        /* ========== CSS COMPLETO (NÃO OFUSCA - PRECISA FUNCIONAR) ========== */
         .access-overlay {
             position: fixed;
             top: 0;
@@ -44,7 +50,7 @@
         .access-input {
             width: 100%;
             padding: 15px;
-            margin: 20px 0;
+            margin: 10px 0;
             background: #0A0A0A;
             border: 2px solid #333;
             border-radius: 10px;
@@ -63,7 +69,7 @@
             cursor: pointer;
             width: 100%;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
         
         .access-message {
@@ -85,7 +91,6 @@
             color: #FF7F7F;
         }
         
-        /* ========== CSS ORIGINAL ========== */
         :root {
             --gold: #D4AF37;
             --gold-light: #F4E4A6;
@@ -193,7 +198,6 @@
             font-size: 1.2rem;
         }
 
-        /* ========== PAINEL DE ESTATÍSTICAS ========== */
         .stats-panel {
             background: linear-gradient(135deg, rgba(26,26,26,0.9), rgba(10,10,10,0.9));
             border: 1px solid var(--gold);
@@ -278,7 +282,6 @@
             background: rgba(212, 175, 55, 0.1);
         }
 
-        /* ========== TABELA DE NÚMEROS ========== */
         .roulette-table {
             display: flex;
             flex-direction: column;
@@ -339,7 +342,6 @@
             background: linear-gradient(135deg, #333, #111);
         }
 
-        /* ========== SEU CSS ORIGINAL CONTINUA ========== */
         .container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -816,22 +818,23 @@
     </style>
 </head>
 <body>
-    <!-- SISTEMA DE ACESSO -->
+    <!-- SISTEMA DE ACESSO COM FIREBASE -->
     <div id="accessSystem" class="access-overlay">
         <div class="access-box">
             <h1 class="access-title">🎯 ARQUEIRO ROULETTE</h1>
             <p style="color: var(--text-dim); margin-bottom: 30px;">Sistema VIP - Acesso Exclusivo</p>
             
-            <p>Digite seu email autorizado:</p>
+            <p>Digite seu email e senha cadastrados:</p>
             
             <input type="email" id="accessEmail" class="access-input" placeholder="seu@email.com" autocomplete="off">
+            <input type="password" id="accessPassword" class="access-input" placeholder="Sua senha" autocomplete="off">
             
-            <button class="access-btn" onclick="verificarAcesso()">🔓 ENTRAR NO SISTEMA</button>
+            <button class="access-btn" onclick="fazerLogin()">🔓 ENTRAR</button>
             
             <div id="accessMessage" class="access-message"></div>
             
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-                Não tem acesso? Entre em contato com o administrador.
+                Não tem acesso? Solicite ao administrador.
             </p>
         </div>
     </div>
@@ -1094,882 +1097,68 @@
     </div>
 
     <script>
-    // ========== SISTEMA DE ACESSO ==========
-    const EMAILS_AUTORIZADOS = [
-        "jeffinho.oliveira94@gmail.com",
-        "hugoalex719@gmail.com",
-        "rosejulio14012019@gmail.com",
-        "cliente3@yahoo.com.br",
-        "gabrieldirectpro@gmail.com",
-        "Machadodias7254@gmail.com",
-        "Jeissonbrambila@gmail.com",
-        "emylimaiara22@gmail.com",
-        "helenmanfredi20@gmail.com",
-        "gilbertosantosbispo@gmail.com",
-        "Paulojk022@gmail.com",
-        "loowscar01@gmail.com",
-        "valsenirsouza@gmail.com",
-        "andreluizsb94@gmail.com"
-    ];
-
-    function verificarAcesso() {
-        const email = document.getElementById('accessEmail').value.trim().toLowerCase();
-        const message = document.getElementById('accessMessage');
-        
-        message.innerHTML = '';
-        message.className = 'access-message';
-        
-        if (!email || !email.includes('@')) {
-            message.innerHTML = '❌ Digite um email válido';
-            message.className = 'access-message access-error';
-            return;
-        }
-        
-        const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
-        
-        if (lista.includes(email)) {
-            localStorage.setItem('arqueiro_acesso', email);
-            message.innerHTML = '✅ Acesso autorizado! Entrando no sistema...';
-            message.className = 'access-message access-success';
-            
-            setTimeout(function() {
-                document.getElementById('accessSystem').style.display = 'none';
-                document.getElementById('mainSystem').style.display = 'block';
-                inicializarSistema();
-            }, 1000);
-        } else {
-            message.innerHTML = '❌ Email não autorizado.<br><br>Entre em contato para solicitar acesso.';
-            message.className = 'access-message access-error';
-        }
-    }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const emailSalvo = localStorage.getItem('arqueiro_acesso');
-        
-        if (emailSalvo) {
-            const lista = EMAILS_AUTORIZADOS.map(e => e.toLowerCase());
-            if (lista.includes(emailSalvo.toLowerCase())) {
-                document.getElementById('accessSystem').style.display = 'none';
-                document.getElementById('mainSystem').style.display = 'block';
-                inicializarSistema();
-                return;
-            } else {
-                localStorage.removeItem('arqueiro_acesso');
-            }
-        }
-        
-        document.getElementById('accessSystem').style.display = 'flex';
-        document.getElementById('mainSystem').style.display = 'none';
-        document.getElementById('accessEmail').focus();
-        document.getElementById('accessEmail').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') verificarAcesso();
-        });
-    });
-
-    // ========== ESTATÍSTICAS COMPLETAS ==========
-    const GRUPO_147 = [1,4,7,10,13,16,19,22,25,28,31,34];
-    const GRUPO_258 = [2,5,8,11,14,17,20,23,26,29,32,35];
-    const GRUPO_0369 = [0,3,6,9,12,15,18,21,24,27,30,33,36];
-    
-    const CIMA_10 = [10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26, 0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23];
-    const BAIXO_0 = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-    
-    const LADO_E = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10];
-    const LADO_D = [5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-
-    function atualizarEstatisticas() {
-        if (numbersHistory.length === 0) {
-            document.getElementById('percent147').textContent = '0%';
-            document.getElementById('count147').textContent = '0/0';
-            document.getElementById('percent258').textContent = '0%';
-            document.getElementById('count258').textContent = '0/0';
-            document.getElementById('percent0369').textContent = '0%';
-            document.getElementById('count0369').textContent = '0/0';
-            document.getElementById('percentCima10').textContent = '0%';
-            document.getElementById('countCima10').textContent = '0/0';
-            document.getElementById('percentBaixo0').textContent = '0%';
-            document.getElementById('countBaixo0').textContent = '0/0';
-            document.getElementById('percentLadoE').textContent = '0%';
-            document.getElementById('countLadoE').textContent = '0/0';
-            document.getElementById('percentLadoD').textContent = '0%';
-            document.getElementById('countLadoD').textContent = '0/0';
-            return;
-        }
-        
-        const total = numbersHistory.length;
-        
-        let count147 = 0, count258 = 0, count0369 = 0;
-        let countCima10 = 0, countBaixo0 = 0;
-        let countLadoE = 0, countLadoD = 0;
-        
-        numbersHistory.forEach(num => {
-            if (GRUPO_147.includes(num)) count147++;
-            if (GRUPO_258.includes(num)) count258++;
-            if (GRUPO_0369.includes(num)) count0369++;
-            if (CIMA_10.includes(num)) countCima10++;
-            if (BAIXO_0.includes(num)) countBaixo0++;
-            if (LADO_E.includes(num)) countLadoE++;
-            if (LADO_D.includes(num)) countLadoD++;
-        });
-        
-        const totalGrupos = count147 + count258 + count0369;
-        const percent147 = totalGrupos > 0 ? Math.round((count147 / totalGrupos) * 100) : 0;
-        const percent258 = totalGrupos > 0 ? Math.round((count258 / totalGrupos) * 100) : 0;
-        const percent0369 = totalGrupos > 0 ? Math.round((count0369 / totalGrupos) * 100) : 0;
-        
-        const totalCimaBaixo = countCima10 + countBaixo0;
-        const percentCima10 = totalCimaBaixo > 0 ? Math.round((countCima10 / totalCimaBaixo) * 100) : 0;
-        const percentBaixo0 = totalCimaBaixo > 0 ? Math.round((countBaixo0 / totalCimaBaixo) * 100) : 0;
-        
-        const totalLados = countLadoE + countLadoD;
-        const percentLadoE = totalLados > 0 ? Math.round((countLadoE / totalLados) * 100) : 0;
-        const percentLadoD = totalLados > 0 ? Math.round((countLadoD / totalLados) * 100) : 0;
-        
-        document.getElementById('percent147').textContent = percent147 + '%';
-        document.getElementById('count147').textContent = `${count147}/${total}`;
-        document.getElementById('percent258').textContent = percent258 + '%';
-        document.getElementById('count258').textContent = `${count258}/${total}`;
-        document.getElementById('percent0369').textContent = percent0369 + '%';
-        document.getElementById('count0369').textContent = `${count0369}/${total}`;
-        document.getElementById('percentCima10').textContent = percentCima10 + '%';
-        document.getElementById('countCima10').textContent = `${countCima10}/${total}`;
-        document.getElementById('percentBaixo0').textContent = percentBaixo0 + '%';
-        document.getElementById('countBaixo0').textContent = `${countBaixo0}/${total}`;
-        document.getElementById('percentLadoE').textContent = percentLadoE + '%';
-        document.getElementById('countLadoE').textContent = `${countLadoE}/${total}`;
-        document.getElementById('percentLadoD').textContent = percentLadoD + '%';
-        document.getElementById('countLadoD').textContent = `${countLadoD}/${total}`;
-        
-        destacarMaiorPercentual();
-    }
-
-    function destacarMaiorPercentual() {
-        document.querySelectorAll('.stat-group').forEach(el => {
-            el.classList.remove('highlight-stat');
-        });
-        
-        const percents = [
-            { id: 'grupo147', value: parseInt(document.getElementById('percent147').textContent) },
-            { id: 'grupo258', value: parseInt(document.getElementById('percent258').textContent) },
-            { id: 'grupo0369', value: parseInt(document.getElementById('percent0369').textContent) },
-            { id: 'ladoCima10', value: parseInt(document.getElementById('percentCima10').textContent) },
-            { id: 'ladoBaixo0', value: parseInt(document.getElementById('percentBaixo0').textContent) },
-            { id: 'ladoE', value: parseInt(document.getElementById('percentLadoE').textContent) },
-            { id: 'ladoD', value: parseInt(document.getElementById('percentLadoD').textContent) }
-        ];
-        
-        const maior = Math.max(...percents.map(p => p.value));
-        
-        percents.forEach(p => {
-            if (p.value === maior && p.value > 0) {
-                document.getElementById(p.id).classList.add('highlight-stat');
-            }
-        });
-    }
-
-    // ========== TABELA DE NÚMEROS ==========
-    function criarTabelaNumeros() {
-        const tabela = document.getElementById('numbersTable');
-        tabela.innerHTML = '';
-        
-        const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
-        
-        const zeroRow = document.createElement('div');
-        zeroRow.className = 'zero-row';
-        const zeroBtn = document.createElement('div');
-        zeroBtn.className = 'number-btn zero';
-        zeroBtn.textContent = '0';
-        zeroBtn.onclick = () => adicionarNumeroClicado(0);
-        zeroRow.appendChild(zeroBtn);
-        tabela.appendChild(zeroRow);
-        
-        const row1 = document.createElement('div');
-        row1.className = 'numbers-row';
-        [3,6,9,12,15,18,21,24,27,30,33,36].forEach(num => {
-            const btn = document.createElement('div');
-            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
-            btn.textContent = num;
-            btn.onclick = () => adicionarNumeroClicado(num);
-            row1.appendChild(btn);
-        });
-        tabela.appendChild(row1);
-        
-        const row2 = document.createElement('div');
-        row2.className = 'numbers-row';
-        [2,5,8,11,14,17,20,23,26,29,32,35].forEach(num => {
-            const btn = document.createElement('div');
-            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
-            btn.textContent = num;
-            btn.onclick = () => adicionarNumeroClicado(num);
-            row2.appendChild(btn);
-        });
-        tabela.appendChild(row2);
-        
-        const row3 = document.createElement('div');
-        row3.className = 'numbers-row';
-        [1,4,7,10,13,16,19,22,25,28,31,34].forEach(num => {
-            const btn = document.createElement('div');
-            btn.className = `number-btn ${redNumbers.includes(num) ? 'red' : 'black'}`;
-            btn.textContent = num;
-            btn.onclick = () => adicionarNumeroClicado(num);
-            row3.appendChild(btn);
-        });
-        tabela.appendChild(row3);
-    }
-
-    function adicionarNumeroClicado(numero) {
-        document.getElementById('numberInput').value = numero;
-        addNumber();
-    }
-
-    // ========== FUNÇÃO DE PROBABILIDADE ÚNICA ==========
-    function calcularProbabilidade(pattern) {
-        let prob = 0;
-        
-        const p147 = parseInt(document.getElementById('percent147')?.textContent || '0');
-        const p258 = parseInt(document.getElementById('percent258')?.textContent || '0');
-        const p0369 = parseInt(document.getElementById('percent0369')?.textContent || '0');
-        const pCima10 = parseInt(document.getElementById('percentCima10')?.textContent || '0');
-        const pBaixo0 = parseInt(document.getElementById('percentBaixo0')?.textContent || '0');
-        const pLadoE = parseInt(document.getElementById('percentLadoE')?.textContent || '0');
-        const pLadoD = parseInt(document.getElementById('percentLadoD')?.textContent || '0');
-        
-        if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
-            const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
-            
-            let grupo = 0;
-            if ([1,4,7].includes(terminal)) grupo = p147;
-            else if ([2,5,8].includes(terminal)) grupo = p258;
-            else if ([0,3,6,9].includes(terminal)) grupo = p0369;
-            
-            let lado = terminal <= 5 ? pCima10 : pBaixo0;
-            let setor = terminal <= 5 ? pLadoD : pLadoE;
-            
-            prob = Math.round((grupo * 0.4) + (lado * 0.3) + (setor * 0.3));
-        }
-        
-        else if (pattern.name === 'Alvo Duplo' && pattern.targetNumbers && pattern.targetNumbers[0]) {
-            const targetNum = pattern.targetNumbers[0];
-            
-            let grupo = 0;
-            if (GRUPO_147.includes(targetNum)) grupo = p147;
-            else if (GRUPO_258.includes(targetNum)) grupo = p258;
-            else if (GRUPO_0369.includes(targetNum)) grupo = p0369;
-            
-            let lado = CIMA_10.includes(targetNum) ? pCima10 : pBaixo0;
-            let setor = LADO_E.includes(targetNum) ? pLadoE : pLadoD;
-            
-            const totalNumeros = numbersHistory.length;
-            const countNumero = numbersHistory.filter(n => n === targetNum).length;
-            const historico = totalNumeros > 0 ? Math.round((countNumero / totalNumeros) * 100) : 0;
-            
-            prob = Math.round((grupo * 0.25) + (lado * 0.25) + (setor * 0.25) + (historico * 0.25));
-        }
-        
-        else if (pattern.name === 'Alvo Gêmeos') {
-            const maiorGrupo = Math.max(p147, p258, p0369);
-            const lado = pCima10;
-            const setor = pLadoD;
-            
-            let totalHistorico = 0;
-            [11,22,33].forEach(num => {
-                totalHistorico += numbersHistory.filter(n => n === num).length;
-            });
-            const historico = numbersHistory.length > 0 ? Math.round((totalHistorico / numbersHistory.length) * 100) : 0;
-            
-            prob = Math.round((maiorGrupo * 0.3) + (lado * 0.2) + (setor * 0.3) + (historico * 0.2));
-        }
-        
-        else if (pattern.name === 'Alvo Triângulo') {
-            const maiorGrupo = Math.max(p147, p258, p0369);
-            const lado = Math.round((pCima10 * 2 + pBaixo0) / 3);
-            const setor = Math.round((pLadoE * 2 + pLadoD) / 3);
-            
-            let totalHistorico = 0;
-            [30,31,32].forEach(num => {
-                totalHistorico += numbersHistory.filter(n => n === num).length;
-            });
-            const historico = numbersHistory.length > 0 ? Math.round((totalHistorico / numbersHistory.length) * 100) : 0;
-            
-            prob = Math.round((maiorGrupo * 0.25) + (lado * 0.25) + (setor * 0.25) + (historico * 0.25));
-        }
-        
-        return Math.min(prob, 100);
-    }
-
-    function getClassificacao(prob) {
-        if (prob >= 40) return { texto: 'TOP 🔥', classe: 'status-top' };
-        if (prob >= 30) return { texto: 'BOM 📈', classe: 'status-bom' };
-        return { texto: 'FRACO ⚠️', classe: 'status-fraco' };
-    }
-
-    function getTestesNecessarios(pattern) {
-        if (pattern.type === 'terminal' && pattern.targetDisplay.includes('T')) {
-            const terminal = parseInt(pattern.targetDisplay.match(/T(\d)/)?.[1] || 0);
-            if ([7,8,9].includes(terminal)) {
-                return 5;
-            }
-        }
-        return 3;
-    }
-
-    // ========== SEU CÓDIGO ORIGINAL DA ROLETA ==========
-    const wheelSequence = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
-    const redNumbers = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12, 3];
-    
-    let numbersHistory = [];
-    let activePatterns = [];
-    let confirmedPatterns = [];
-    let completedPatterns = [];
-    let stats = {
-        totalNumbers: 0,
-        patternsTriggered: 0,
-        patternsConfirmed: 0,
-        patternsCancelled: 0,
-        greenSignals: 0,
-        redSignals: 0
-    };
-    let multipleConfirmationsBlock = false;
-
-    function inicializarSistema() {
-        criarTabelaNumeros();
-        loadFromLocalStorage();
-        updateDisplay();
-        
-        document.getElementById('addNumberBtn').addEventListener('click', addNumber);
-        document.getElementById('numberInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addNumber();
-        });
-        document.getElementById('clearLastBtn').addEventListener('click', clearLastNumber);
-        document.getElementById('clearBtn').addEventListener('click', clearHistory);
-        document.getElementById('resetBtn').addEventListener('click', resetAll);
-        
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                const tabId = this.getAttribute('data-tab');
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-            });
-        });
-    }
-
-    function addNumber() {
-        const input = document.getElementById('numberInput');
-        const number = parseInt(input.value);
-        
-        if (isNaN(number) || number < 0 || number > 36) {
-            alert('Por favor, digite um número válido entre 0 e 36.');
-            return;
-        }
-        
-        numbersHistory.push(number);
-        stats.totalNumbers++;
-        
-        processNewNumber(number);
-        
-        input.value = '';
-        input.focus();
-        
-        updateDisplay();
-        saveToLocalStorage();
-    }
-
-    function clearLastNumber() {
-        if (numbersHistory.length > 0) {
-            const removed = numbersHistory.pop();
-            stats.totalNumbers--;
-            
-            const beforeCount = activePatterns.length;
-            activePatterns = activePatterns.filter(pattern => {
-                if (pattern.trigger && pattern.trigger.includes(removed.toString())) {
-                    console.log(`🗑️ Padrão ${pattern.name} removido (gatilho: ${pattern.trigger})`);
-                    return false;
-                }
-                return true;
-            });
-            
-            console.log(`↩️ Número ${removed} removido. ${activePatterns.length} padrões ativos restantes`);
-            updateDisplay();
-            saveToLocalStorage();
-        }
-    }
-
-    function processNewNumber(number) {
-        console.log(`=== PROCESSANDO NÚMERO ${number} ===`);
-        
-        // 1. Primeiro verificar resultados de padrões já confirmados
-        checkConfirmedPatternResults(number);
-        
-        // 2. Verificar cancelamento de padrões ativos
-        activePatterns.forEach(pattern => {
-            if (pattern.status === 'active' && pattern.cancellationSet.includes(number)) {
-                pattern.status = 'cancelled';
-                pattern.cancelledBy = number;
-                stats.patternsCancelled++;
-                console.log(`❌ ${pattern.name} CANCELADO por ${number}`);
-            }
-        });
-        
-        // 3. Atualizar confirmações de padrões ativos NÃO cancelados
-        activePatterns.forEach(pattern => {
-            if (pattern.status === 'active') {
-                if (!pattern.cancellationSet.includes(number)) {
-                    pattern.confirmationCount++;
-                    
-                    const testesNecessarios = getTestesNecessarios(pattern);
-                    console.log(`🔄 ${pattern.name}: ${pattern.confirmationCount}/${testesNecessarios}`);
-                    
-                    if (pattern.confirmationCount >= testesNecessarios) {
-                        pattern.status = 'confirmed';
-                        pattern.confirmedAt = numbersHistory.length;
-                        pattern.checkedNumbers = 0;
-                        pattern.lastConfirmedNumber = number;
-                        stats.patternsConfirmed++;
-                        console.log(`✅ ${pattern.name} CONFIRMADO! Número ${number} NÃO conta como teste`);
-                        
-                        confirmedPatterns.push(pattern);
-                    }
-                }
-            }
-        });
-        
-        // 4. Remover padrões cancelados e confirmados dos ativos
-        activePatterns = activePatterns.filter(pattern => 
-            pattern.status === 'active'
-        );
-        
-        // 5. Verificar novos padrões
-        checkForNewPatterns();
-        
-        // 6. Verificar múltiplos confirmados
-        checkMultipleConfirmations();
-    }
-
-    function checkConfirmedPatternResults(number) {
-        const patternsToProcess = [...confirmedPatterns];
-        let removedIndices = [];
-        
-        patternsToProcess.forEach((pattern, processIndex) => {
-            if (pattern.status === 'confirmed') {
-                // SÓ PROCESSA SE NÃO FOR O NÚMERO QUE CONFIRMOU
-                if (number !== pattern.lastConfirmedNumber) {
-                    pattern.checkedNumbers = (pattern.checkedNumbers || 0) + 1;
-                    console.log(`📊 ${pattern.name}: teste ${pattern.checkedNumbers}/3 (número: ${number})`);
-                    
-                    if (pattern.betNumbers.includes(number)) {
-                        pattern.status = 'green';
-                        pattern.finalResult = 'green';
-                        pattern.winningNumber = number;
-                        stats.greenSignals++;
-                        console.log(`🎉 ${pattern.name} GREEN! Acertou com número ${number}`);
-                        
-                        const originalIndex = confirmedPatterns.indexOf(pattern);
-                        if (originalIndex !== -1) removedIndices.push(originalIndex);
-                        
-                        if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                    } else if (pattern.checkedNumbers >= 3) {
-                        pattern.status = 'red';
-                        pattern.finalResult = 'red';
-                        stats.redSignals++;
-                        console.log(`❌ ${pattern.name} RED! Não acertou em 3 rodadas após confirmação`);
-                        
-                        const originalIndex = confirmedPatterns.indexOf(pattern);
-                        if (originalIndex !== -1) removedIndices.push(originalIndex);
-                        
-                        if (multipleConfirmationsBlock) multipleConfirmationsBlock = false;
-                    }
-                } else {
-                    console.log(`⏸️ ${pattern.name}: Número ${number} causou a confirmação, não conta como teste`);
-                }
-            }
-        });
-        
-        if (removedIndices.length > 0) {
-            removedIndices.sort((a, b) => b - a).forEach(index => {
-                const removed = confirmedPatterns.splice(index, 1)[0];
-                completedPatterns.push(removed);
-            });
-        }
-    }
-
-    function checkMultipleConfirmations() {
-        if (confirmedPatterns.length > 1 && !multipleConfirmationsBlock) {
-            console.log("⚠️ MÚLTIPLOS CONFIRMADOS DETECTADOS!");
-            multipleConfirmationsBlock = true;
-        }
-        if (confirmedPatterns.length <= 1 && multipleConfirmationsBlock) {
-            multipleConfirmationsBlock = false;
-        }
-    }
-
-    function checkForNewPatterns() {
-        if (numbersHistory.length < 2) return;
-        if (multipleConfirmationsBlock) {
-            console.log("🚫 Bloqueio ativo: não criando novos padrões");
-            return;
-        }
-        
-        const lastIndex = numbersHistory.length - 1;
-        const currentNumber = numbersHistory[lastIndex];
-        const lastNumber = numbersHistory[lastIndex - 1];
-        
-        console.log(`🔍 Verificando padrões entre: ${lastNumber} e ${currentNumber}`);
-        
-        // ========== ALVO DUPLO - CORRIGIDO ==========
-        if (currentNumber === lastNumber && currentNumber !== 36) {
-            const target = (currentNumber + 1) % 37;
-            
-            // Cancelamento: 3 vizinhos = 7 números
-            const neighborsCancel = getNeighborsInWheel(target, 3);
-            const cancellationSet = [target, ...neighborsCancel];
-            
-            // Pagamento: 6 vizinhos = 13 números
-            const neighborsPay = getNeighborsInWheel(target, 6);
-            const betNumbers = [target, ...neighborsPay];
-            
-            const pattern = {
-                id: generateId(),
-                strategy: 1,
-                name: 'Alvo Duplo',
-                trigger: `${currentNumber}, ${currentNumber}`,
-                targetDisplay: `${target} com 6V`,
-                targetNumbers: [target],
-                betNumbers: betNumbers,
-                cancellationSet: cancellationSet,
-                status: 'active',
-                confirmationCount: 0,
-                betSize: betNumbers.length,
-                type: 'specific',
-                createdAt: Date.now()
-            };
-            
-            if (!isPatternDuplicate(pattern)) {
-                activePatterns.push(pattern);
-                stats.patternsTriggered++;
-                console.log(`🎯 NOVO: Alvo Duplo para ${target} | Cancelamento: ${cancellationSet.length} núm | Pagamento: ${betNumbers.length} núm`);
-            }
-        }
-        
-        // ========== PADRÕES TERMINAIS ==========
-        const lastTerminal = lastNumber % 10;
-        const currentTerminal = currentNumber % 10;
-        
-        if (currentTerminal === lastTerminal && currentNumber !== lastNumber && currentTerminal !== 0) {
-            const targetTerminal = (currentTerminal - 1 + 10) % 10;
-            createTerminalPattern('Alvo Alternado', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-        }
-        
-        const diff = Math.abs(currentTerminal - lastTerminal);
-        if (diff === 1) {
-            const isAscending = currentTerminal > lastTerminal;
-            let targetTerminal;
-            if (isAscending) {
-                targetTerminal = (currentTerminal + 1) % 10;
-            } else {
-                targetTerminal = (Math.min(currentTerminal, lastTerminal) - 1 + 10) % 10;
-            }
-            createTerminalPattern('Alvo Variável', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-        }
-        
-        if (diff === 2) {
-            const targetTerminal = Math.min(currentTerminal, lastTerminal) + 1;
-            createTerminalPattern('Alvo Central', `${lastNumber} (T${lastTerminal}), ${currentNumber} (T${currentTerminal})`, targetTerminal);
-        }
-        
-        // ========== ALVO GÊMEOS ==========
-        if ([11, 22, 33].includes(currentNumber)) {
-            createGemeosTriangulo('Alvo Gêmeos', `${currentNumber}`, [11, 22, 33], 2);
-        }
-        
-        // ========== ALVO TRIÂNGULO ==========
-        if ([30, 31, 32].includes(currentNumber)) {
-            createGemeosTriangulo('Alvo Triângulo', `${currentNumber}`, [30, 31, 32], 2);
-        }
-    }
-
-    function createTerminalPattern(name, trigger, targetTerminal) {
-        const targetNumbers = getNumbersByTerminal(targetTerminal);
-        const neighbors = [];
-        
-        targetNumbers.forEach(num => {
-            neighbors.push(...getNeighborsInWheel(num, 1));
-        });
-        
-        const cancellationSet = [...targetNumbers, ...neighbors];
-        const betNumbers = [...targetNumbers, ...neighbors];
-        
-        const pattern = {
-            id: generateId(),
-            strategy: name === 'Alvo Alternado' ? 2 : name === 'Alvo Variável' ? 3 : 4,
-            name: name,
-            trigger: trigger,
-            targetDisplay: `T${targetTerminal} com 1V`,
-            targetNumbers: targetNumbers,
-            betNumbers: betNumbers,
-            cancellationSet: cancellationSet,
-            status: 'active',
-            confirmationCount: 0,
-            betSize: betNumbers.length,
-            type: 'terminal',
-            createdAt: Date.now()
-        };
-        
-        if (!isPatternDuplicate(pattern)) {
-            activePatterns.push(pattern);
-            stats.patternsTriggered++;
-            console.log(`🎯 NOVO: ${name} para T${targetTerminal} | Cancelamento/Pagamento: ${cancellationSet.length} núm`);
-        }
-    }
-
-    function createGemeosTriangulo(name, trigger, targetNumbers, neighborCount) {
-        const neighbors = [];
-        
-        targetNumbers.forEach(num => {
-            neighbors.push(...getNeighborsInWheel(num, 2));
-        });
-        
-        const cancellationSet = [...targetNumbers, ...neighbors];
-        const betNumbers = [...targetNumbers, ...neighbors];
-        const displayName = name === 'Alvo Gêmeos' ? 'Gêmeos (11, 22, 33)' : 'Triângulo (30, 31, 32)';
-        
-        const pattern = {
-            id: generateId(),
-            strategy: name === 'Alvo Gêmeos' ? 5 : 6,
-            name: name,
-            trigger: trigger,
-            targetDisplay: `${displayName} com 2V`,
-            targetNumbers: targetNumbers,
-            betNumbers: betNumbers,
-            cancellationSet: cancellationSet,
-            status: 'active',
-            confirmationCount: 0,
-            betSize: betNumbers.length,
-            type: 'specific',
-            createdAt: Date.now()
-        };
-        
-        if (!isPatternDuplicate(pattern)) {
-            activePatterns.push(pattern);
-            stats.patternsTriggered++;
-            console.log(`🎯 NOVO: ${name} | Cancelamento/Pagamento: ${cancellationSet.length} núm`);
-        }
-    }
-
-    function isPatternDuplicate(newPattern) {
-        const isActiveDuplicate = activePatterns.some(pattern => 
-            pattern.strategy === newPattern.strategy &&
-            pattern.trigger === newPattern.trigger &&
-            pattern.status === 'active'
-        );
-        const isConfirmedDuplicate = confirmedPatterns.some(pattern =>
-            pattern.strategy === newPattern.strategy &&
-            pattern.trigger === newPattern.trigger
-        );
-        return isActiveDuplicate || isConfirmedDuplicate;
-    }
-
-    function getNeighborsInWheel(number, count) {
-        const index = wheelSequence.indexOf(number);
-        if (index === -1) return [];
-        const neighbors = [];
-        for (let i = 1; i <= count; i++) {
-            const aboveIndex = (index - i + wheelSequence.length) % wheelSequence.length;
-            neighbors.push(wheelSequence[aboveIndex]);
-            const belowIndex = (index + i) % wheelSequence.length;
-            neighbors.push(wheelSequence[belowIndex]);
-        }
-        return neighbors;
-    }
-
-    function getNumbersByTerminal(terminal) {
-        return wheelSequence.filter(num => num % 10 === terminal);
-    }
-
-    function generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-
-    function getColorForNumber(num) {
-        if (num === 0) return '#2E8B57';
-        return redNumbers.includes(num) ? '#DC143C' : '#333';
-    }
-
-    function updateDisplay() {
-        const numbersHistoryElement = document.getElementById('numbersHistory');
-        numbersHistoryElement.innerHTML = '';
-        
-        if (numbersHistory.length === 0) {
-            numbersHistoryElement.innerHTML = '<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';
-        } else {
-            numbersHistory.slice(-16).reverse().forEach((num, index) => {
-                const isLatest = index === 0;
-                const chip = document.createElement('div');
-                chip.className = `number-chip ${num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black'} ${isLatest ? 'latest' : ''}`;
-                chip.textContent = num;
-                const position = numbersHistory.length - index;
-                chip.title = `Posição: ${position}${isLatest ? ' (Último)' : ''}`;
-                numbersHistoryElement.appendChild(chip);
-            });
-        }
-        
-        document.getElementById('totalNumbers').textContent = stats.totalNumbers;
-        document.getElementById('activePatterns').textContent = activePatterns.length;
-        document.getElementById('confirmedPatterns').textContent = confirmedPatterns.length;
-        document.getElementById('greenSignals').textContent = stats.greenSignals;
-        document.getElementById('redSignals').textContent = stats.redSignals;
-        
-        const confirmedHighlight = document.getElementById('confirmedPatternsHighlight');
-        confirmedHighlight.innerHTML = '';
-        
-        if (confirmedPatterns.length > 0) {
-            confirmedPatterns.forEach(pattern => {
-                const panel = document.createElement('div');
-                panel.className = 'panel confirmed-highlight';
-                const numbersSinceConfirmation = pattern.checkedNumbers || 0;
-                
-                const prob = calcularProbabilidade(pattern);
-                const classificacao = getClassificacao(prob);
-                
-                panel.innerHTML = `
+        // FIREBASE CONFIG
+        const _0x21e8=['YXBpS2V5','AUzaSyDXLMubditL3yqGZGvQgNlkx1IqNVLgjlI','YXV0aERvbWFpbg==','ZmVycmFtZW50YS1yb2xldGEuZmlyZWJhc2VhcHAuY29t','cHJvamVjdElk','ZmVycmFtZW50YS1yb2xldGE='];(function(_0x4b7b02,_0x21e8f0){const _0x2a4f35=function(_0x12038f){while(--_0x12038f){_0x4b7b02['push'](_0x4b7b02['shift']());}};_0x2a4f35(++_0x21e8f0);}(_0x21e8,0x1b3));const _0x2a4f=function(_0x4b7b02,_0x21e8f0){_0x4b7b02=_0x4b7b02-0x0;let _0x2a4f35=_0x21e8[_0x4b7b02];if(_0x2a4f['N2N5Y3M']===undefined){var _0x12038f=function(_0x5e326f){const _0x3d0e09='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x2d3c4c='',_0x2f8d14='';for(let _0x3b9f8b=0x0,_0x140659,_0x564e79=0x0;_0x564e79=_0x5e326f['charAt'](_0x3b9f8b++);~_0x564e79&&(_0x140659=_0x2f8d14[_0x3b9f8b%0x4]?_0x140659*0x40+_0x564e79:_0x564e59,_0x2f8d14[_0x3b9f8b%0x4]?0x0:_0x2d3c4c+=String['fromCharCode'](0xff&_0x140659>>(-0x2*_0x3b9f8b&0x6)))){_0x564e79=_0x3d0e09['indexOf'](_0x564e79);}return _0x2d3c4c;};_0x2a4f['X2RlY29kZQ==']=function(_0x2346c2){const _0x2f0b5c=_0x12038f(_0x2346c2);let _0x4c4a17='';for(let _0x119fd3=0x0,_0x3c5e8f=_0x2f0b5c['length'];_0x119fd3<_0x3c5e8f;_0x119fd3++){_0x4c4a17+='%'+('00'+_0x2f0b5c['charCodeAt'](_0x119fd3)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x4c4a17);};_0x2a4f['a0Y0czU=']={};_0x2a4f['N2N5Y3M']=!![];}const _0x5e326f=_0x2a4f['X2RlY29kZQ=='],_0x3d0e09=_0x5e326f(_0x2a4f35);return _0x3d0e09;};(function(){const _0x5c6e63={apiKey:_0x2a4f('0x1'),authDomain:_0x2a4f('0x2'),projectId:_0x2a4f('0x3'),storageBucket:'ferramenta-roleta\x2efirebasestorage\x2eapp',messagingSenderId:'320783587312',appId:'1:320783587312:web:837d1307d4b64446ae6f35'};firebase['initializeApp'](_0x5c6e63);window['auth']=firebase['auth']();}());(function(){const _0x1789d9=_0x2a4f;function _0x3ed565(){const _0x1df2ab=_0x2a4f,_0x47a078=document[_0x1df2ab('0x4')]('accessEmail')['value']['trim'](),_0x31ce0f=document['getElementById']('accessPassword')['value'],_0x3c3ae4=document[_0x1df2ab('0x4')]('accessMessage');_0x3c3ae4['innerHTML']='',_0x3c3ae4['className']='access-message';if(!_0x47a078||!_0x31ce0f)return _0x3c3ae4['innerHTML']='❌ Preencha email e senha',void(_0x3c3ae4['className']='access-message access-error');window['auth'][_0x1df2ab('0x5')](_0x47a078,_0x31ce0f)['then'](_0x3aab4f=>{const _0x158aeb=_0x1df2ab;localStorage['setItem']('arqueiro_acesso',_0x47a078),_0x3c3ae4[_0x158aeb('0x6')]='✅ Acesso autorizado! Entrando...',_0x3c3ae4['className']='access-message access-success',setTimeout(function(){document[_0x158aeb('0x4')]('accessSystem')['style']['display']='none',document[_0x158aeb('0x4')]('mainSystem')[_0x158aeb('0x7')]['display']='block',inicializarSistema();},0x3e8);})[_0x1df2ab('0x8')](_0x2636be=>{const _0x37ce9c=_0x1df2ab;console[_0x37ce9c('0x9')]('Erro de autenticação:',_0x2636be);if(_0x2636be[_0x37ce9c('0xa')]===_0x37ce9c('0xb'))_0x3c3ae4[_0x37ce9c('0x6')]='❌ Usuário não encontrado. Solicite acesso.';else if(_0x2636be[_0x37ce9c('0xa')]==='auth/wrong-password')_0x3c3ae4[_0x37ce9c('0x6')]='❌ Senha incorreta';else if(_0x2636be[_0x37ce9c('0xa')]==='auth/invalid-email')_0x3c3ae4['innerHTML']='❌ Email inválido';else _0x3c3ae4[_0x37ce9c('0x6')]='❌ Erro ao fazer login';_0x3c3ae4['className']='access-message access-error';});}document[_0x1789d9('0xc')](_0x1789d9('0xd'),function(){const _0x4dbea3=_0x1789d9;window['auth']['onAuthStateChanged'](_0x184afb=>{const _0x2b95f3=_0x4dbea3;if(_0x184afb){localStorage[_0x2b95f3('0xe')]('arqueiro_acesso',_0x184afb['email']),document['getElementById']('accessSystem')[_0x2b95f3('0x7')]['display']='none',document[_0x2b95f3('0x4')]('mainSystem')['style']['display']='block',inicializarSistema();}else{document['getElementById']('accessSystem')[_0x2b95f3('0x7')]['display']='flex',document[_0x2b95f3('0x4')]('mainSystem')[_0x2b95f3('0x7')]['display']='none',document[_0x2b95f3('0x4')]('accessEmail')['focus'](),document[_0x2b95f3('0x4')]('accessPassword')[_0x2b95f3('0xf')]('keypress',function(_0x5ba4dd){_0x5ba4dd['key']==='Enter'&&_0x3ed565();});}});});}());const GRUPO_147=[0x1,0x4,0x7,0xa,0xd,0x10,0x13,0x16,0x19,0x1c,0x1f,0x22];const GRUPO_258=[0x2,0x5,0x8,0xb,0xe,0x11,0x14,0x17,0x1a,0x1d,0x20,0x23];const GRUPO_0369=[0x0,0x3,0x6,0x9,0xc,0xf,0x12,0x15,0x18,0x1b,0x1e,0x21,0x24];const CIMA_10=[0xa,0x5,0x18,0x10,0x21,0x1,0x14,0xe,0x1f,0x9,0x16,0x12,0x1d,0x7,0x1c,0xc,0x23,0x3,0x1a,0x0,0x20,0xf,0x13,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17];const BAIXO_0=[0x0,0x20,0xf,0x13,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17,0xa,0x5,0x18,0x10,0x21,0x1,0x14,0xe,0x1f,0x9,0x16,0x12,0x1d,0x7,0x1c,0xc,0x23,0x3,0x1a];const LADO_E=[0x0,0x20,0xf,0x13,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17,0xa];const LADO_D=[0x5,0x18,0x10,0x21,0x1,0x14,0xe,0x1f,0x9,0x16,0x12,0x1d,0x7,0x1c,0xc,0x23,0x3,0x1a];function atualizarEstatisticas(){const _0x2b9fcd=_0x2a4f;if(0x0===numbersHistory['length']){document['getElementById']('percent147')[_0x2b9fcd('0x10')]='0%',document[_0x2b9fcd('0x4')]('count147')[_0x2b9fcd('0x10')]='0/0',document['getElementById']('percent258')['textContent']='0%',document[_0x2b9fcd('0x4')]('count258')['textContent']='0/0',document['getElementById']('percent0369')[_0x2b9fcd('0x10')]='0%',document['getElementById']('count0369')[_0x2b9fcd('0x10')]='0/0',document['getElementById']('percentCima10')['textContent']='0%',document[_0x2b9fcd('0x4')]('countCima10')[_0x2b9fcd('0x10')]='0/0',document['getElementById']('percentBaixo0')['textContent']='0%',document['getElementById']('countBaixo0')[_0x2b9fcd('0x10')]='0/0',document['getElementById']('percentLadoE')[_0x2b9fcd('0x10')]='0%',document['getElementById']('countLadoE')['textContent']='0/0',document['getElementById']('percentLadoD')['textContent']='0%',document['getElementById']('countLadoD')['textContent']='0/0';return;}const _0x5c3e8f=numbersHistory['length'];let _0x4b7b02=0x0,_0x21e8f0=0x0,_0x2a4f35=0x0,_0x5e326f=0x0,_0x3d0e09=0x0,_0x12038f=0x0,_0x3b9f8b=0x0;numbersHistory['forEach'](_0x140659=>{const _0x564e79=_0x2b9fcd;GRUPO_147[_0x564e79('0x11')](_0x140659)&&_0x4b7b02++,GRUPO_258[_0x564e79('0x11')](_0x140659)&&_0x21e8f0++,GRUPO_0369[_0x564e79('0x11')](_0x140659)&&_0x2a4f35++,CIMA_10[_0x564e79('0x11')](_0x140659)&&_0x5e326f++,BAIXO_0[_0x564e79('0x11')](_0x140659)&&_0x3d0e09++,LADO_E['includes'](_0x140659)&&_0x12038f++,LADO_D[_0x564e79('0x11')](_0x140659)&&_0x3b9f8b++;});const _0x2f8d14=_0x4b7b02+_0x21e8f0+_0x2a4f35,_0x3d1e0f=_0x2f8d14>0x0?Math['round'](0x64*_0x4b7b02/_0x2f8d14):0x0,_0x564e59=_0x2f8d14>0x0?Math[_0x2b9fcd('0x12')](0x64*_0x21e8f0/_0x2f8d14):0x0,_0x2d3c4c=_0x2f8d14>0x0?Math['round'](0x64*_0x2a4f35/_0x2f8d14):0x0,_0x4c4a17=_0x5e326f+_0x3d0e09,_0x119fd3=_0x4c4a17>0x0?Math[_0x2b9fcd('0x12')](0x64*_0x5e326f/_0x4c4a17):0x0,_0x3c5e8f=_0x4c4a17>0x0?Math[_0x2b9fcd('0x12')](0x64*_0x3d0e09/_0x4c4a17):0x0,_0x2346c2=_0x12038f+_0x3b9f8b,_0x2f0b5c=_0x2346c2>0x0?Math[_0x2b9fcd('0x12')](0x64*_0x12038f/_0x2346c2):0x0,_0x4f5a2c=_0x2346c2>0x0?Math[_0x2b9fcd('0x12')](0x64*_0x3b9f8b/_0x2346c2):0x0;document['getElementById']('percent147')[_0x2b9fcd('0x10')]=_0x3d1e0f+'%',document['getElementById']('count147')['textContent']=_0x4b7b02+'/'+_0x5c3e8f,document['getElementById']('percent258')['textContent']=_0x564e59+'%',document['getElementById']('count258')['textContent']=_0x21e8f0+'/'+_0x5c3e8f,document[_0x2b9fcd('0x4')]('percent0369')[_0x2b9fcd('0x10')]=_0x2d3c4c+'%',document['getElementById']('count0369')[_0x2b9fcd('0x10')]=_0x2a4f35+'/'+_0x5c3e8f,document['getElementById']('percentCima10')['textContent']=_0x119fd3+'%',document[_0x2b9fcd('0x4')]('countCima10')['textContent']=_0x5e326f+'/'+_0x5c3e8f,document['getElementById']('percentBaixo0')[_0x2b9fcd('0x10')]=_0x3c5e8f+'%',document[_0x2b9fcd('0x4')]('countBaixo0')[_0x2b9fcd('0x10')]=_0x3d0e09+'/'+_0x5c3e8f,document[_0x2b9fcd('0x4')]('percentLadoE')['textContent']=_0x2f0b5c+'%',document[_0x2b9fcd('0x4')]('countLadoE')[_0x2b9fcd('0x10')]=_0x12038f+'/'+_0x5c3e8f,document['getElementById']('percentLadoD')['textContent']=_0x4f5a2c+'%',document['getElementById']('countLadoD')[_0x2b9fcd('0x10')]=_0x3b9f8b+'/'+_0x5c3e8f,function(){const _0x1750b5=_0x2b9fcd;document[_0x1750b5('0x13')]('stat-group')['forEach'](_0x56399b=>{_0x56399b['classList']['remove']('highlight-stat');});const _0x5d74e4=[{id:'grupo147',value:parseInt(document[_0x1750b5('0x4')]('percent147')['textContent'])},{id:'grupo258',value:parseInt(document[_0x1750b5('0x4')]('percent258')['textContent'])},{id:'grupo0369',value:parseInt(document['getElementById']('percent0369')['textContent'])},{id:'ladoCima10',value:parseInt(document[_0x1750b5('0x4')]('percentCima10')[_0x1750b5('0x10')])},{id:'ladoBaixo0',value:parseInt(document['getElementById']('percentBaixo0')['textContent'])},{id:'ladoE',value:parseInt(document['getElementById']('percentLadoE')['textContent'])},{id:'ladoD',value:parseInt(document[_0x1750b5('0x4')]('percentLadoD')[_0x1750b5('0x10')])}];const _0x14a88e=Math[_0x1750b5('0x14')](..._0x5d74e4[_0x1750b5('0x15')](_0x136a2b=>_0x136a2b['value']));_0x5d74e4['forEach'](_0x394d94=>{const _0x29f6b0=_0x1750b5;_0x394d94['value']===_0x14a88e&&_0x394d94['value']>0x0&&document[_0x29f6b0('0x4')](_0x394d94['id'])['classList']['add']('highlight-stat');});}();}function criarTabelaNumeros(){const _0x334272=_0x2a4f,_0x3aee0f=document['getElementById']('numbersTable');_0x3aee0f['innerHTML']='';const _0x8e6b40=[0x20,0x13,0x15,0x19,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17];const _0x24c7b6=document['createElement']('div');_0x24c7b6[_0x334272('0x16')]='zero-row';const _0x20ed2b=document['createElement']('div');_0x20ed2b[_0x334272('0x16')]='number-btn zero',_0x20ed2b['textContent']='0',_0x20ed2b['onclick']=()=>adicionarNumeroClicado(0x0),_0x24c7b6['appendChild'](_0x20ed2b),_0x3aee0f['appendChild'](_0x24c7b6);const _0x2d6f4c=document['createElement']('div');_0x2d6f4c[_0x334272('0x16')]='numbers-row';[0x3,0x6,0x9,0xc,0xf,0x12,0x15,0x18,0x1b,0x1e,0x21,0x24]['forEach'](_0x119fd3=>{const _0x3c5e8f=document['createElement']('div');_0x3c5e8f['className']=`number-btn ${_0x8e6b40[_0x334272('0x11')](_0x119fd3)?'red':'black'}`,_0x3c5e8f['textContent']=_0x119fd3,_0x3c5e8f['onclick']=()=>adicionarNumeroClicado(_0x119fd3),_0x2d6f4c['appendChild'](_0x3c5e8f);}),_0x3aee0f['appendChild'](_0x2d6f4c);const _0x1e23d4=document[_0x334272('0x17')]('div');_0x1e23d4[_0x334272('0x16')]='numbers-row';[0x2,0x5,0x8,0xb,0xe,0x11,0x14,0x17,0x1a,0x1d,0x20,0x23]['forEach'](_0x119fd3=>{const _0x3c5e8f=document[_0x334272('0x17')]('div');_0x3c5e8f['className']=`number-btn ${_0x8e6b40[_0x334272('0x11')](_0x119fd3)?'red':'black'}`,_0x3c5e8f[_0x334272('0x10')]=_0x119fd3,_0x3c5e8f['onclick']=()=>adicionarNumeroClicado(_0x119fd3),_0x1e23d4[_0x334272('0x18')](_0x3c5e8f);}),_0x3aee0f[_0x334272('0x18')](_0x1e23d4);const _0x5b9d3c=document[_0x334272('0x17')]('div');_0x5b9d3c[_0x334272('0x16')]='numbers-row';[0x1,0x4,0x7,0xa,0xd,0x10,0x13,0x16,0x19,0x1c,0x1f,0x22]['forEach'](_0x119fd3=>{const _0x3c5e8f=document[_0x334272('0x17')]('div');_0x3c5e8f['className']=`number-btn ${_0x8e6b40[_0x334272('0x11')](_0x119fd3)?'red':'black'}`,_0x3c5e8f[_0x334272('0x10')]=_0x119fd3,_0x3c5e8f['onclick']=()=>adicionarNumeroClicado(_0x119fd3),_0x5b9d3c[_0x334272('0x18')](_0x3c5e8f);}),_0x3aee0f['appendChild'](_0x5b9d3c);}function adicionarNumeroClicado(_0x4b7b02){const _0x3b6475=_0x2a4f;document[_0x3b6475('0x4')]('numberInput')['value']=_0x4b7b02,addNumber();}function getClassificacao(_0x4b7b02){const _0x17290b=_0x2a4f;return _0x4b7b02>=0x28?{texto:'TOP 🔥',classe:_0x17290b('0x19')}:_0x4b7b02>=0x1e?{texto:'BOM 📈',classe:'status-bom'}:{texto:'FRACO ⚠️',classe:_0x17290b('0x1a')};}function getTestesNecessarios(_0x4b7b02){const _0x1568e3=_0x2a4f;if(_0x4b7b02['type']==='terminal'&&_0x4b7b02[_0x1568e3('0x1b')]['includes']('T')){const _0x56de19=parseInt(_0x4b7b02['targetDisplay']['match'](/T(\d)/)?.[0x1]||0x0);if([0x7,0x8,0x9][_0x1568e3('0x11')](_0x56de19))return 0x5;}return 0x3;}const wheelSequence=[0x0,0x20,0xf,0x13,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17,0xa,0x5,0x18,0x10,0x21,0x1,0x14,0xe,0x1f,0x9,0x16,0x12,0x1d,0x7,0x1c,0xc,0x23,0x3,0x1a];const redNumbers=[0x20,0x13,0x15,0x19,0x4,0x15,0x2,0x19,0x11,0x22,0x6,0x1b,0xd,0x24,0xb,0x1e,0x8,0x17];let numbersHistory=[],activePatterns=[],confirmedPatterns=[],completedPatterns=[],stats={totalNumbers:0x0,patternsTriggered:0x0,patternsConfirmed:0x0,patternsCancelled:0x0,greenSignals:0x0,redSignals:0x0};let multipleConfirmationsBlock=![];function inicializarSistema(){const _0x8e6b40=_0x2a4f;criarTabelaNumeros(),function(){const _0x9eb14f=_0x2a4f,_0x6d2e73=localStorage['getItem']('arqueiroRouletteData');if(_0x6d2e73)try{const _0x1deeaf=JSON[_0x9eb14f('0x1c')](_0x6d2e73);numbersHistory=_0x1deeaf['numbersHistory']||[],stats=_0x1deeaf['stats']||{totalNumbers:0x0,patternsTriggered:0x0,patternsConfirmed:0x0,patternsCancelled:0x0,greenSignals:0x0,redSignals:0x0},activePatterns=[],confirmedPatterns=[],completedPatterns=[],multipleConfirmationsBlock=![],numbersHistory['forEach']((_0x45439a,_0x4b647b)=>{_0x4b647b>0x0&&_0x21e8f0(_0x45439a);});}catch(_0x575c85){console[_0x9eb14f('0x9')]("Erro ao carregar dados salvos:",_0x575c85),numbersHistory=[],stats={totalNumbers:0x0,patternsTriggered:0x0,patternsConfirmed:0x0,patternsCancelled:0x0,greenSignals:0x0,redSignals:0x0};}}(),function(){const _0x4b7b02=_0x8e6b40;if(0x0===numbersHistory[_0x4b7b02('0x1d')]){document[_0x4b7b02('0x4')]('numbersHistory')['innerHTML']='<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';}else{const _0x21e8f0=document['getElementById']('numbersHistory');_0x21e8f0[_0x4b7b02('0x6')]='',numbersHistory[_0x4b7b02('0x1e')](-0x10)[_0x4b7b02('0x1f')]()['forEach']((_0x2a4f35,_0x5e326f)=>{const _0x3d0e09=_0x4b7b02,_0x12038f=0x0===_0x5e326f,_0x3b9f8b=document[_0x3d0e09('0x17')]('div');_0x3b9f8b[_0x3d0e09('0x16')]=`number-chip ${0x0===_0x2a4f35?'zero':redNumbers[_0x3d0e09('0x11')](_0x2a4f35)?'red':'black'} ${_0x12038f?'latest':''}`,_0x3b9f8b['textContent']=_0x2a4f35;const _0x140659=numbersHistory[_0x3d0e09('0x1d')]-_0x5e326f;_0x3b9f8b['title']=`Posição: ${_0x140659}${_0x12038f?' (Último)':''}`,_0x21e8f0[_0x3d0e09('0x18')](_0x3b9f8b);});}document['getElementById']('totalNumbers')['textContent']=stats['totalNumbers'],document[_0x4b7b02('0x4')]('activePatterns')[_0x4b7b02('0x10')]=activePatterns[_0x4b7b02('0x1d')],document[_0x4b7b02('0x4')]('confirmedPatterns')['textContent']=confirmedPatterns[_0x4b7b02('0x1d')],document[_0x4b7b02('0x4')]('greenSignals')[_0x4b7b02('0x10')]=stats['greenSignals'],document[_0x4b7b02('0x4')]('redSignals')['textContent']=stats['redSignals'];const _0x564e79=document[_0x4b7b02('0x4')]('confirmedPatternsHighlight');_0x564e79[_0x4b7b02('0x6')]='';if(confirmedPatterns[_0x4b7b02('0x1d')]>0x0)confirmedPatterns['forEach'](_0x2d3c4c=>{const _0x4c4a17=document[_0x4b7b02('0x17')]('div');_0x4c4a17[_0x4b7b02('0x16')]='panel confirmed-highlight';const _0x119fd3=_0x2d3c4c[_0x4b7b02('0x20')]||0x0,_0x3c5e8f=function(_0x20ed2b){const _0x2d6f4c=_0x4b7b02;let _0x1e23d4=0x0;const _0x5b9d3c=parseInt(document['getElementById']('percent147')?.['textContent']||'0'),_0x24c7b6=parseInt(document[_0x2d6f4c('0x4')]('percent258')?.[_0x2d6f4c('0x10')]||'0'),_0x8e6b40=parseInt(document['getElementById']('percent0369')?.['textContent']||'0'),_0x3aee0f=parseInt(document['getElementById']('percentCima10')?.['textContent']||'0'),_0x20ed2b=parseInt(document['getElementById']('percentBaixo0')?.['textContent']||'0'),_0x2d6f4c=parseInt(document[_0x2d6f4c('0x4')]('percentLadoE')?.['textContent']||'0'),_0x1e23d4=parseInt(document['getElementById']('percentLadoD')?.['textContent']||'0');if(_0x20ed2b['type']==='terminal'&&_0x20ed2b['targetDisplay']['includes']('T')){const _0x3b6475=parseInt(_0x20ed2b['targetDisplay']['match'](/T(\d)/)?.[0x1]||0x0);let _0x17290b=0x0;if([0x1,0x4,0x7]['includes'](_0x3b6475))_0x17290b=_0x5b9d3c;else if([0x2,0x5,0x8][_0x3aee0f](_0x3b6475))_0x17290b=_0x24c7b6;else if([0x0,0x3,0x6,0x9][_0x3aee0f](_0x3b6475))_0x17290b=_0x8e6b40;let _0x56de19=_0x3b6475<=0x5?_0x3aee0f:_0x20ed2b,_0x3d0e09=_0x3b6475<=0x5?_0x2d6f4c:_0x1e23d4;_0x1e23d4=Math['round'](0.4*_0x17290b+0.3*_0x56de19+0.3*_0x3d0e09);}else if(_0x20ed2b['name']==='Alvo Duplo'&&_0x20ed2b['targetNumbers']&&_0x20ed2b['targetNumbers'][0x0]){const _0x157e50=_0x20ed2b['targetNumbers'][0x0];let _0x2d3c4c=0x0;if(GRUPO_147[_0x3aee0f](_0x157e50))_0x2d3c4c=_0x5b9d3c;else if(GRUPO_258['includes'](_0x157e50))_0x2d3c4c=_0x24c7b6;else if(GRUPO_0369[_0x3aee0f](_0x157e50))_0x2d3c4c=_0x8e6b40;let _0x30e9f0=CIMA_10[_0x3aee0f](_0x157e50)?_0x3aee0f:_0x20ed2b,_0x5a8a41=LADO_E['includes'](_0x157e50)?_0x2d6f4c:_0x1e23d4;const _0x2346c2=numbersHistory['length'],_0x2f0b5c=numbersHistory['filter'](_0x439441=>_0x439441===_0x157e50)['length'],_0x4f5a2c=_0x2346c2>0x0?Math[_0x3aee0f](0x64*_0x2f0b5c/_0x2346c2):0x0;_0x1e23d4=Math[_0x3aee0f](0.25*_0x2d3c4c+0.25*_0x30e9f0+0.25*_0x5a8a41+0.25*_0x4f5a2c);}else if(_0x20ed2b['name']==='Alvo Gêmeos'){const _0x44a01a=Math[_0x3aee0f](_0x5b9d3c,_0x24c7b6,_0x8e6b40),_0x453274=_0x3aee0f,_0x17e25a=_0x2d6f4c;let _0x2c9d3b=0x0;[0xb,0x16,0x21]['forEach'](_0x4c1b68=>{_0x2c9d3b+=numbersHistory['filter'](_0x4c4a17=>_0x4c4a17===_0x4c1b68)['length'];}) const _0x119fd3=numbersHistory['length']>0x0?Math[_0x3aee0f](0x64*_0x2c9d3b/numbersHistory['length']):0x0;_0x1e23d4=Math['round'](0.3*_0x44a01a+0.2*_0x453274+0.3*_0x17e25a+0.2*_0x119fd3);}else if(_0x20ed2b['name']==='Alvo Triângulo'){const _0x2675c5=Math[_0x3aee0f](_0x5b9d3c,_0x24c7b6,_0x8e6b40),_0x1d9c56=Math['round']((2*_0x3aee0f+_0x20ed2b)/0x3),_0x52f027=Math['round']((2*_0x2d6f4c+_0x1e23d4)/0x3);let _0x411a34=0x0;[0x1e,0x1f,0x20]['forEach'](_0x466e12=>{_0x411a34+=numbersHistory['filter'](_0x32f519=>_0x32f519===_0x466e12)['length'];}) const _0x119fd3=numbersHistory['length']>0x0?Math[_0x3aee0f](0x64*_0x411a34/numbersHistory['length']):0x0;_0x1e23d4=Math['round'](0.25*_0x2675c5+0.25*_0x1d9c56+0.25*_0x52f027+0.25*_0x119fd3);}return Math[_0x3aee0f](_0x1e23d4,0x64);}(_0x2d3c4c),_0x5e326f=getClassificacao(_0x3c5e8f);_0x4c4a17['innerHTML']=`
                     <div class="panel-title">
                         <i>🚨</i> SINAL CONFIRMADO - APOSTE AGORA!
                     </div>
                     <div class="pattern-header">
-                        <div class="pattern-title">${pattern.name}</div>
+                        <div class="pattern-title">${_0x2d3c4c['name']}</div>
                         <div class="pattern-status status-confirmed">CONFIRMADO</div>
                     </div>
-                    <div class="pattern-details"><strong>Gatilho:</strong> ${pattern.trigger}</div>
-                    <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                    <div class="pattern-status ${classificacao.classe}" style="margin: 10px 0; font-size: 1rem;">
-                        ${classificacao.texto} ${prob}%
+                    <div class="pattern-details"><strong>Gatilho:</strong> ${_0x2d3c4c['trigger']}</div>
+                    <div class="pattern-target">🎯 ${_0x2d3c4c['targetDisplay']}</div>
+                    <div class="pattern-status ${_0x5e326f['classe']}" style="margin: 10px 0; font-size: 1rem;">
+                        ${_0x5e326f['texto']} ${_0x3c5e8f}%
                     </div>
-                    <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${pattern.betSize} números</div>
-                    <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${numbersSinceConfirmation}/3</div>
+                    <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${_0x2d3c4c['betSize']} números</div>
+                    <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${_0x119fd3}/3</div>
                     <div class="pattern-details"><strong>Números para apostar:</strong></div>
                     <div class="pattern-numbers">
-                        ${pattern.betNumbers.map(num => {
-                            const isTarget = pattern.targetNumbers.includes(num);
-                            const colorClass = num === 0 ? 'zero' : redNumbers.includes(num) ? 'red' : 'black';
-                            return `<div class="pattern-number ${colorClass} ${isTarget ? 'target' : ''}" style="background-color: ${getColorForNumber(num)}">${num}</div>`;
-                        }).join('')}
+                        ${_0x2d3c4c['betNumbers']['map'](_0x48cfa8=>{const _0x577a2c=_0x2d3c4c['targetNumbers']['includes'](_0x48cfa8),_0x4ef2e6=_0x48cfa8===0x0?'zero':redNumbers['includes'](_0x48cfa8)?'red':'black';return`<div class="pattern-number ${_0x4ef2e6} ${_0x577a2c?'target':''}" style="background-color: ${function(_0x42e2e9){return 0x0===_0x42e2e9?'#2E8B57':redNumbers['includes'](_0x42e2e9)?'#DC143C':'#333';}(_0x48cfa8)}">${_0x48cfa8}</div>`;})['join']('')}
                     </div>
-                `;
-                confirmedHighlight.appendChild(panel);
-            });
-        }
-        
-        const activePatternsList = document.getElementById('activePatternsList');
-        activePatternsList.innerHTML = '';
-        
-        const activePatternsFiltered = activePatterns.filter(pattern => pattern.status === 'active');
-        
-        if (activePatternsFiltered.length === 0) {
-            activePatternsList.innerHTML = '<div style="color: var(--text-dim); text-align: center; padding: 30px;">Nenhum padrão ativo no momento</div>';
-        } else {
-            activePatternsFiltered.forEach(pattern => {
-                const patternCard = document.createElement('div');
-                patternCard.className = 'pattern-card';
-                
-                const prob = calcularProbabilidade(pattern);
-                const classificacao = getClassificacao(prob);
-                const testesNecessarios = getTestesNecessarios(pattern);
-                
-                patternCard.innerHTML = `
+                `,_0x564e79['appendChild'](_0x4c4a17);});const _0x2d3c4c=document['getElementById']('activePatternsList');_0x2d3c4c[_0x4b7b02('0x6')]='';const _0x4c4a17=activePatterns[_0x4b7b02('0x21')](_0x119fd3=>_0x119fd3['status']==='active');if(0x0===_0x4c4a17[_0x4b7b02('0x1d')])_0x2d3c4c['innerHTML']='<div style="color: var(--text-dim); text-align: center; padding: 30px;">Nenhum padrão ativo no momento</div>';else _0x4c4a17[_0x4b7b02('0x22')](_0x119fd3=>{const _0x3c5e8f=document['createElement']('div');_0x3c5e8f[_0x4b7b02('0x16')]='pattern-card';const _0x5e326f=function(_0x48cfa8){const _0x577a2c=_0x4b7b02;let _0x4ef2e6=0x0;const _0x42e2e9=parseInt(document[_0x577a2c('0x4')]('percent147')?.[_0x577a2c('0x10')]||'0'),_0x3b6475=parseInt(document[_0x577a2c('0x4')]('percent258')?.['textContent']||'0'),_0x17290b=parseInt(document['getElementById']('percent0369')?.[_0x577a2c('0x10')]||'0'),_0x56de19=parseInt(document[_0x577a2c('0x4')]('percentCima10')?.['textContent']||'0'),_0x3d0e09=parseInt(document[_0x577a2c('0x4')]('percentBaixo0')?.['textContent']||'0'),_0x12038f=parseInt(document[_0x577a2c('0x4')]('percentLadoE')?.[_0x577a2c('0x10')]||'0'),_0x3b9f8b=parseInt(document['getElementById']('percentLadoD')?.['textContent']||'0');if(_0x48cfa8['type']==='terminal'&&_0x48cfa8[_0x577a2c('0x1b')]['includes']('T')){const _0x140659=parseInt(_0x48cfa8['targetDisplay']['match'](/T(\d)/)?.[0x1]||0x0);let _0x564e79=0x0;if([0x1,0x4,0x7]['includes'](_0x140659))_0x564e79=_0x42e2e9;else if([0x2,0x5,0x8][_0x577a2c('0x11')](_0x140659))_0x564e79=_0x3b6475;else if([0x0,0x3,0x6,0x9][_0x577a2c('0x11')](_0x140659))_0x564e79=_0x17290b;let _0x2d3c4c=_0x140659<=0x5?_0x56de19:_0x3d0e09,_0x4c4a17=_0x140659<=0x5?_0x12038f:_0x3b9f8b;_0x4ef2e6=Math['round'](0.4*_0x564e79+0.3*_0x2d3c4c+0.3*_0x4c4a17);}else if(_0x48cfa8['name']==='Alvo Duplo'&&_0x48cfa8['targetNumbers']&&_0x48cfa8['targetNumbers'][0x0]){const _0x119fd3=_0x48cfa8['targetNumbers'][0x0];let _0x3c5e8f=0x0;if(GRUPO_147['includes'](_0x119fd3))_0x3c5e8f=_0x42e2e9;else if(GRUPO_258[_0x577a2c('0x11')](_0x119fd3))_0x3c5e8f=_0x3b6475;else if(GRUPO_0369['includes'](_0x119fd3))_0x3c5e8f=_0x17290b;let _0x5e326f=CIMA_10[_0x577a2c('0x11')](_0x119fd3)?_0x56de19:_0x3d0e09,_0x1e23d4=LADO_E['includes'](_0x119fd3)?_0x12038f:_0x3b9f8b;const _0x8e6b40=numbersHistory[_0x577a2c('0x1d')],_0x3aee0f=numbersHistory[_0x577a2c('0x21')](_0x48cfa8=>_0x48cfa8===_0x119fd3)[_0x577a2c('0x1d')],_0x20ed2b=_0x8e6b40>0x0?Math['round'](0x64*_0x3aee0f/_0x8e6b40):0x0;_0x4ef2e6=Math[_0x577a2c('0x12')](0.25*_0x3c5e8f+0.25*_0x5e326f+0.25*_0x1e23d4+0.25*_0x20ed2b);}else if(_0x48cfa8['name']==='Alvo Gêmeos'){const _0x2d6f4c=Math[_0x577a2c('0x14')](_0x42e2e9,_0x3b6475,_0x17290b),_0x24c7b6=_0x56de19,_0x8e6b40=_0x12038f;let _0x3aee0f=0x0;[0xb,0x16,0x21]['forEach'](_0x157e50=>{_0x3aee0f+=numbersHistory[_0x577a2c('0x21')](_0x30e9f0=>_0x30e9f0===_0x157e50)[_0x577a2c('0x1d')];}) const _0x20ed2b=numbersHistory[_0x577a2c('0x1d')]>0x0?Math[_0x577a2c('0x12')](0x64*_0x3aee0f/numbersHistory['length']):0x0;_0x4ef2e6=Math[_0x577a2c('0x12')](0.3*_0x2d6f4c+0.2*_0x24c7b6+0.3*_0x8e6b40+0.2*_0x20ed2b);}else if(_0x48cfa8['name']==='Alvo Triângulo'){const _0x2d3c4c=Math[_0x577a2c('0x14')](_0x42e2e9,_0x3b6475,_0x17290b),_0x4c4a17=Math[_0x577a2c('0x12')]((2*_0x56de19+_0x3d0e09)/0x3),_0x119fd3=Math[_0x577a2c('0x12')]((2*_0x12038f+_0x3b9f8b)/0x3);let _0x3c5e8f=0x0;[0x1e,0x1f,0x20]['forEach'](_0x5e326f=>{_0x3c5e8f+=numbersHistory[_0x577a2c('0x21')](_0x1e23d4=>_0x1e23d4===_0x5e326f)[_0x577a2c('0x1d')];}) const _0x8e6b40=numbersHistory[_0x577a2c('0x1d')]>0x0?Math['round'](0x64*_0x3c5e8f/numbersHistory[_0x577a2c('0x1d')]):0x0;_0x4ef2e6=Math[_0x577a2c('0x12')](0.25*_0x2d3c4c+0.25*_0x4c4a17+0.25*_0x119fd3+0.25*_0x8e6b40);}return Math['min'](_0x4ef2e6,0x64);}(_0x119fd3),_0x1e23d4=getClassificacao(_0x5e326f),_0x8e6b40=getTestesNecessarios(_0x119fd3);_0x3c5e8f['innerHTML']=`
                     <div class="pattern-header">
-                        <div class="pattern-title">${pattern.name}</div>
+                        <div class="pattern-title">${_0x119fd3['name']}</div>
                         <div class="pattern-status status-active">Ativo</div>
                     </div>
-                    <div class="pattern-details">Gatilho: ${pattern.trigger}</div>
-                    <div class="pattern-target">🎯 ${pattern.targetDisplay}</div>
-                    <div class="pattern-status ${classificacao.classe}" style="margin: 10px 0;">
-                        ${classificacao.texto} ${prob}%
+                    <div class="pattern-details">Gatilho: ${_0x119fd3['trigger']}</div>
+                    <div class="pattern-target">🎯 ${_0x119fd3['targetDisplay']}</div>
+                    <div class="pattern-status ${_0x1e23d4['classe']}" style="margin: 10px 0;">
+                        ${_0x1e23d4['texto']} ${_0x5e326f}%
                     </div>
-                    <div class="pattern-details">Aguardando confirmação: ${pattern.confirmationCount}/${testesNecessarios}</div>
-                `;
-                
-                activePatternsList.appendChild(patternCard);
-            });
-        }
-        
-        atualizarEstatisticas();
-    }
-
-    function clearHistory() {
-        if (confirm('Tem certeza que deseja limpar o histórico?')) {
-            numbersHistory = [];
-            stats.totalNumbers = 0;
-            updateDisplay();
-            saveToLocalStorage();
-        }
-    }
-
-    function resetAll() {
-        if (confirm('Tem certeza que deseja reiniciar tudo?')) {
-            numbersHistory = [];
-            activePatterns = [];
-            confirmedPatterns = [];
-            completedPatterns = [];
-            multipleConfirmationsBlock = false;
-            stats = {
-                totalNumbers: 0,
-                patternsTriggered: 0,
-                patternsConfirmed: 0,
-                patternsCancelled: 0,
-                greenSignals: 0,
-                redSignals: 0
-            };
-            updateDisplay();
-            localStorage.removeItem('arqueiroRouletteData');
-        }
-    }
-
-    function saveToLocalStorage() {
-        const data = {
-            numbersHistory,
-            stats,
-            version: 'FINAL_COMPLETO'
-        };
-        localStorage.setItem('arqueiroRouletteData', JSON.stringify(data));
-    }
-
-    function loadFromLocalStorage() {
-        const savedData = localStorage.getItem('arqueiroRouletteData');
-        if (savedData) {
-            try {
-                const data = JSON.parse(savedData);
-                numbersHistory = data.numbersHistory || [];
-                stats = data.stats || {
-                    totalNumbers: 0,
-                    patternsTriggered: 0,
-                    patternsConfirmed: 0,
-                    patternsCancelled: 0,
-                    greenSignals: 0,
-                    redSignals: 0
-                };
-                activePatterns = [];
-                confirmedPatterns = [];
-                completedPatterns = [];
-                multipleConfirmationsBlock = false;
-                
-                numbersHistory.forEach((num, index) => {
-                    if (index > 0) processNewNumber(num);
-                });
-            } catch (e) {
-                console.error("Erro ao carregar dados salvos:", e);
-                numbersHistory = [];
-                stats = {
-                    totalNumbers: 0,
-                    patternsTriggered: 0,
-                    patternsConfirmed: 0,
-                    patternsCancelled: 0,
-                    greenSignals: 0,
-                    redSignals: 0
-                };
-            }
-        }
-    }
+                    <div class="pattern-details">Aguardando confirmação: ${_0x119fd3['confirmationCount']}/${_0x8e6b40}</div>
+                `,_0x2d3c4c['appendChild'](_0x3c5e8f);}),function(){const _0x3aee0f=_0x4b7b02;atualizarEstatisticas();}();}();document[_0x8e6b40('0x4')]('addNumberBtn')['addEventListener']('click',addNumber),document['getElementById']('numberInput')['addEventListener']('keypress',function(_0x119fd3){const _0x3c5e8f=_0x8e6b40;_0x119fd3['key']==='Enter'&&addNumber();}),document['getElementById']('clearLastBtn')[_0x8e6b40('0xf')]('click',function(){const _0x564e79=_0x8e6b40;if(numbersHistory['length']>0x0){const _0x4c4a17=numbersHistory['pop']();stats['totalNumbers']--;const _0x119fd3=activePatterns[_0x564e79('0x1d')];activePatterns=activePatterns[_0x564e79('0x21')](_0x3c5e8f=>{const _0x5e326f=_0x564e79;if(_0x3c5e8f['trigger']&&_0x3c5e8f['trigger'][_0x5e326f('0x11')](_0x4c4a17['toString']()))return console['log'](`🗑️ Padrão ${_0x3c5e8f['name']} removido (gatilho: ${_0x3c5e8f['trigger']})`),![];return !![];}),console['log'](`↩️ Número ${_0x4c4a17} removido. ${activePatterns['length']} padrões ativos restantes`),function(){const _0x5b9d3c=_0x564e79;updateDisplay(),function(){const _0x24c7b6=_0x5b9d3c,_0x8e6b40={numbersHistory:numbersHistory,stats:stats,version:'FINAL_COMPLETO'};localStorage['setItem']('arqueiroRouletteData',JSON[_0x24c7b6('0x23')](_0x8e6b40));}();}();}}),document['getElementById']('clearBtn')['addEventListener']('click',function(){const _0x3d0e09=_0x8e6b40;confirm('Tem certeza que deseja limpar o histórico?')&&(numbersHistory=[],stats['totalNumbers']=0x0,function(){const _0x12038f=_0x3d0e09;updateDisplay(),function(){const _0x3b9f8b=_0x12038f,_0x140659={numbersHistory:numbersHistory,stats:stats,version:'FINAL_COMPLETO'};localStorage[_0x3b9f8b('0xe')]('arqueiroRouletteData',JSON[_0x3b9f8b('0x23')](_0x140659));}();}());}),document[_0x8e6b40('0x4')]('resetBtn')[_0x8e6b40('0xf')]('click',function(){const _0x564e79=_0x8e6b40;confirm('Tem certeza que deseja reiniciar tudo?')&&(numbersHistory=[],activePatterns=[],confirmedPatterns=[],completedPatterns=[],multipleConfirmationsBlock=![],stats={totalNumbers:0x0,patternsTriggered:0x0,patternsConfirmed:0x0,patternsCancelled:0x0,greenSignals:0x0,redSignals:0x0},function(){const _0x4c4a17=_0x564e79;updateDisplay(),localStorage['removeItem']('arqueiroRouletteData');}());}),document['querySelectorAll']('.tab')['forEach'](_0x119fd3=>{const _0x3c5e8f=_0x8e6b40;_0x119fd3[_0x3c5e8f('0xf')]('click',function(){const _0x5e326f=_0x3c5e8f,_0x1e23d4=this['getAttribute']('data-tab');document['querySelectorAll']('.tab')['forEach'](_0x8e6b40=>_0x8e6b40['classList']['remove']('active')),document['querySelectorAll']('.tab-content')['forEach'](_0x3aee0f=>_0x3aee0f['classList']['remove']('active')),this[_0x5e326f('0x16')]['add']('active'),document['getElementById'](_0x1e23d4+'-tab')['classList']['add']('active');});});}function addNumber(){const _0x4b7b02=_0x2a4f,_0x21e8f0=document['getElementById']('numberInput'),_0x2a4f35=parseInt(_0x21e8f0['value']);if(isNaN(_0x2a4f35)||_0x2a4f35<0x0||_0x2a4f35>0x24)return alert('Por favor, digite um número válido entre 0 e 36.');numbersHistory['push'](_0x2a4f35),stats['totalNumbers']++,_0x21e8f0(_0x2a4f35),_0x21e8f0['value']='',_0x21e8f0['focus'](),function(){const _0x5e326f=_0x4b7b02;updateDisplay(),function(){const _0x3d0e09=_0x5e326f,_0x12038f={numbersHistory:numbersHistory,stats:stats,version:'FINAL_COMPLETO'};localStorage[_0x3d0e09('0xe')]('arqueiroRouletteData',JSON[_0x3d0e09('0x23')](_0x12038f));}();}();}function _0x21e8f0(_0x4b7b02){const _0x5e326f=_0x2a4f;console[_0x5e326f('0x9')](`=== PROCESSANDO NÚMERO ${_0x4b7b02} ===`),function(_0x3d0e09){const _0x12038f=_0x5e326f,_0x3b9f8b=[...confirmedPatterns];let _0x140659=[];_0x3b9f8b[_0x12038f('0x22')]((_0x564e79,_0x4c4a17)=>{const _0x119fd3=_0x12038f;if(_0x564e79['status']==='confirmed')if(_0x3d0e09!==_0x564e79['lastConfirmedNumber']){_0x564e79['checkedNumbers']=(_0x564e79['checkedNumbers']||0x0)+0x1,console[_0x119fd3('0x9')](`📊 ${_0x564e79['name']}: teste ${_0x564e79['checkedNumbers']}/3 (número: ${_0x3d0e09})`);if(_0x564e79['betNumbers'][_0x119fd3('0x11')](_0x3d0e09)){_0x564e79['status']='green',_0x564e79['finalResult']='green',_0x564e79['winningNumber']=_0x3d0e09,stats['greenSignals']++,console['log'](`🎉 ${_0x564e79['name']} GREEN! Acertou com número ${_0x3d0e09}`);const _0x3c5e8f=confirmedPatterns['indexOf'](_0x564e79);_0x3c5e8f!==-0x1&&_0x140659[_0x119fd3('0x24')](_0x3c5e8f),multipleConfirmationsBlock&&(multipleConfirmationsBlock=![]);}else if(_0x564e79['checkedNumbers']>=0x3){_0x564e79['status']='red',_0x564e79['finalResult']='red',stats['redSignals']++,console['log'](`❌ ${_0x564e79['name']} RED! Não acertou em 3 rodadas após confirmação`);const _0x3c5e8f=confirmedPatterns[_0x119fd3('0x11')](_0x564e79);_0x3c5e8f!==-0x1&&_0x140659[_0x119fd3('0x24')](_0x3c5e8f),multipleConfirmationsBlock&&(multipleConfirmationsBlock=![]);}}else console[_0x119fd3('0x9')](`⏸️ ${_0x564e79['name']}: Número ${_0x3d0e09} causou a confirmação, não conta como teste`);});if(_0x140659[_0x12038f('0x1d')]>0x0){_0x140659[_0x12038f('0x25')]((_0x3c5e8f,_0x5e326f)=>_0x5e326f-_0x3c5e8f)[_0x12038f('0x22')](_0x3c5e8f=>{const _0x5e326f=confirmedPatterns[_0x12038f('0x26')](_0x3c5e8f,0x1)[0x0];completedPatterns[_0x12038f('0x24')](_0x5e326f);});}}(_0x4b7b02),activePatterns[_0x5e326f('0x22')](_0x3d0e09=>{const _0x12038f=_0x5e326f;_0x3d0e09['status']==='active'&&_0x3d0e09['cancellationSet'][_0x12038f('0x11')](_0x4b7b02)&&(_0x3d0e09['status']='cancelled',_0x3d0e09['cancelledBy']=_0x4b7b02,stats['patternsCancelled']++,console['log'](`❌ ${_0x3d0e09['name']} CANCELADO por ${_0x4b7b02}`));}),activePatterns['forEach'](_0x3d0e09=>{const _0x12038f=_0x5e326f;if(_0x3d0e09['status']==='active'&&!_0x3d0e09['cancellationSet']['includes'](_0x4b7b02)){_0x3d0e09['confirmationCount']++;const _0x3b9f8b=getTestesNecessarios(_0x3d0e09);console['log'](`🔄 ${_0x3d0e09['name']}: ${_0x3d0e09['confirmationCount']}/${_0x3b9f8b}`);if(_0x3d0e09['confirmationCount']>=_0x3b9f8b)_0x3d0e09['status']='confirmed',_0x3d0e09['confirmedAt']=numbersHistory[_0x12038f('0x1d')],_0x3d0e09['checkedNumbers']=0x0,_0x3d0e09['lastConfirmedNumber']=_0x4b7b02,stats['patternsConfirmed']++,console['log'](`✅ ${_0x3d0e09['name']} CONFIRMADO! Número ${_0x4b7b02} NÃO conta como teste`),confirmedPatterns[_0x12038f('0x24')](_0x3d0e09);}}),activePatterns=activePatterns['filter'](_0x3d0e09=>_0x3d0e09['status']==='active'),function(){const _0x3b9f8b=_0x5e326f;if(numbersHistory[_0x3b9f8b('0x1d')]<0x2)return;if(multipleConfirmationsBlock)return void console['log']("🚫 Bloqueio ativo: não criando novos padrões");const _0x140659=numbersHistory[_0x3b9f8b('0x1d')]-0x1,_0x564e79=numbersHistory[_0x140659],_0x4c4a17=numbersHistory[_0x140659-0x1];console[_0x3b9f8b('0x9')](`🔍 Verificando padrões entre: ${_0x4c4a17} e ${_0x564e79}`);if(_0x564e79===_0x4c4a17&&_0x564e79!==0x24){const _0x119fd3=(_0x564e79+0x1)%0x25,_0x3c5e8f=getNeighborsInWheel(_0x119fd3,0x3),_0x5e326f=[_0x119fd3,..._0x3c5e8f],_0x1e23d4=getNeighborsInWheel(_0x119fd3,0x6),_0x8e6b40=[_0x119fd3,..._0x1e23d4];const _0x3aee0f={id:generateId(),strategy:0x1,name:'Alvo Duplo',trigger:`${_0x564e79}, ${_0x564e79}`,targetDisplay:`${_0x119fd3} com 6V`,targetNumbers:[_0x119fd3],betNumbers:_0x8e6b40,cancellationSet:_0x5e326f,status:'active',confirmationCount:0x0,betSize:_0x8e6b40['length'],type:'specific',createdAt:Date['now']()};!function(_0x20ed2b){const _0x2d6f4c=_0x3b9f8b,_0x24c7b6=activePatterns['some'](_0x8e6b40=>_0x8e6b40[_0x2d6f4c('0x27')]===_0x20ed2b['strategy']&&_0x8e6b40['trigger']===_0x20ed2b['trigger']&&_0x8e6b40['status']==='active'),_0x3aee0f=confirmedPatterns['some'](_0x5e326f=>_0x5e326f['strategy']===_0x20ed2b['strategy']&&_0x5e326f['trigger']===_0x20ed2b['trigger']);return _0x24c7b6||_0x3aee0f;}(_0x3aee0f)||(activePatterns[_0x3b9f8b('0x24')](_0x3aee0f),stats['patternsTriggered']++,console[_0x3b9f8b('0x9')](`🎯 NOVO: Alvo Duplo para ${_0x119fd3} | Cancelamento: ${_0x5e326f['length']} núm | Pagamento: ${_0x8e6b40['length']} núm`));}const _0x119fd3=_0x4c4a17%0xa,_0x3c5e8f=_0x564e79%0xa;if(_0x3c5e8f===_0x119fd3&&_0x564e79!==_0x4c4a17&&0x0!==_0x3c5e8f){const _0x5e326f=(_0x3c5e8f-0x1+0xa)%0xa;!function(_0x1e23d4,_0x8e6b40,_0x3aee0f,_0x20ed2b){const _0x2d6f4c=_0x3b9f8b,_0x24c7b6=getNumbersByTerminal(_0x20ed2b);let _0x3aee0f=[];_0x24c7b6[_0x2d6f4c('0x22')](_0x8e6b40=>{const _0x3aee0f=getNeighborsInWheel(_0x8e6b40,0x1);_0x3aee0f['push'](..._0x3aee0f);});const _0x5e326f=[..._0x24c7b6,..._0x3aee0f];const _0x1e23d4=[..._0x24c7b6,..._0x3aee0f];const _0x8e6b40={id:generateId(),strategy:'Alvo Alternado'===_0x1e23d4?0x2:'Alvo Variável'===_0x1e23d4?0x3:0x4,name:_0x1e23d4,trigger:_0x8e6b40,targetDisplay:`T${_0x20ed2b} com 1V`,targetNumbers:_0x24c7b6,betNumbers:_0x1e23d4,cancellationSet:_0x5e326f,status:'active',confirmationCount:0x0,betSize:_0x1e23d4['length'],type:'terminal',createdAt:Date['now']()};!function(_0x1e23d4){const _0x8e6b40=_0x2d6f4c,_0x3aee0f=activePatterns[_0x8e6b40('0x11')](_0x20ed2b=>_0x20ed2b['strategy']===_0x1e23d4['strategy']&&_0x20ed2b['trigger']===_0x1e23d4['trigger']&&_0x20ed2b['status']==='active'),_0x5e326f=confirmedPatterns[_0x8e6b40('0x11')](_0x3aee0f=>_0x3aee0f['strategy']===_0x1e23d4['strategy']&&_0x3aee0f['trigger']===_0x1e23d4['trigger']);return _0x3aee0f||_0x5e326f;}(_0x8e6b40)||(activePatterns[_0x2d6f4c('0x24')](_0x8e6b40),stats['patternsTriggered']++,console[_0x2d6f4c('0x9')](`🎯 NOVO: ${_0x1e23d4} para T${_0x20ed2b} | Cancelamento/Pagamento: ${_0x5e326f['length']} núm`));}('Alvo Alternado',`${_0x4c4a17} (T${_0x119fd3}), ${_0x564e79} (T${_0x3c5e8f})`,_0x5e326f);}const _0x5e326f=Math[_0x3b9f8b('0x28')](_0x3c5e8f-_0x119fd3);if(0x1===_0x5e326f){const _0x1e23d4=_0x3c5e8f>_0x119fd3;let _0x8e6b40;_0x1e23d4?_0x8e6b40=(_0x3c5e8f+0x1)%0xa:_0x8e6b40=(Math[_0x3b9f8b('0x29')](_0x3c5e8f,_0x119fd3)-0x1+0xa)%0xa;!function(_0x1e23d4,_0x8e6b40,_0x3aee0f,_0x20ed2b){const _0x2d6f4c=_0x3b9f8b,_0x24c7b6=getNumbersByTerminal(_0x20ed2b);let _0x3aee0f=[];_0x24c7b6['forEach'](_0x8e6b40=>{const _0x3aee0f=getNeighborsInWheel(_0x8e6b40,0x1);_0x3aee0f['push'](..._0x3aee0f);});const _0x5e326f=[..._0x24c7b6,..._0x3aee0f];const _0x1e23d4=[..._0x24c7b6,..._0x3aee0f];const _0x8e6b40={id:generateId(),strategy:'Alvo Alternado'===_0x1e23d4?0x2:'Alvo Variável'===_0x1e23d4?0x3:0x4,name:_0x1e23d4,trigger:_0x8e6b40,targetDisplay:`T${_0x20ed2b} com 1V`,targetNumbers:_0x24c7b6,betNumbers:_0x1e23d4,cancellationSet:_0x5e326f,status:'active',confirmationCount:0x0,betSize:_0x1e23d4['length'],type:'terminal',createdAt:Date[_0x2d6f4c('0x2a')]()};!function(_0x1e23d4){const _0x8e6b40=_0x2d6f4c,_0x3aee0f=activePatterns[_0x8e6b40('0x11')](_0x20ed2b=>_0x20ed2b['strategy']===_0x1e23d4['strategy']&&_0x20ed2b['trigger']===_0x1e23d4['trigger']&&_0x20ed2b['status']==='active'),_0x5e326f=confirmedPatterns[_0x8e6b40('0x11')](_0x3aee0f=>_0x3aee0f['strategy']===_0x1e23d4['strategy']&&_0x3aee0f['trigger']===_0x1e23d4['trigger']);return _0x3aee0f||_0x5e326f;}(_0x8e6b40)||(activePatterns[_0x2d6f4c('0x24')](_0x8e6b40),stats['patternsTriggered']++,console[_0x2d6f4c('0x9')](`🎯 NOVO: ${_0x1e23d4} para T${_0x20ed2b} | Cancelamento/Pagamento: ${_0x5e326f['length']} núm`));}('Alvo Variável',`${_0x4c4a17} (T${_0x119fd3}), ${_0x564e79} (T${_0x3c5e8f})`,_0x8e6b40);}if(0x2===_0x5e326f){const _0x1e23d4=Math[_0x3b9f8b('0x29')](_0x3c5e8f,_0x119fd3)+0x1;!function(_0x8e6b40,_0x3aee0f,_0x20ed2b,_0x2d6f4c){const _0x24c7b6=_0x3b9f8b,_0x3aee0f=getNumbersByTerminal(_0x2d6f4c);let _0x20ed2b=[];_0x3aee0f[_0x24c7b6('0x22')](_0x8e6b40=>{const _0x20ed2b=getNeighborsInWheel(_0x8e6b40,0x1);_0x20ed2b[_0x24c7b6('0x24')](..._0x20ed2b);});const _0x2d6f4c=[..._0x3aee0f,..._0x20ed2b];const _0x8e6b40=[..._0x3aee0f,..._0x20ed2b];const _0x24c7b6={id:generateId(),strategy:'Alvo Alternado'===_0x8e6b40?0x2:'Alvo Variável'===_0x8e6b40?0x3:0x4,name:_0x8e6b40,trigger:_0x3aee0f,targetDisplay:`T${_0x2d6f4c} com 1V`,targetNumbers:_0x3aee0f,betNumbers:_0x8e6b40,cancellationSet:_0x2d6f4c,status:'active',confirmationCount:0x0,betSize:_0x8e6b40['length'],type:'terminal',createdAt:Date[_0x24c7b6('0x2a')]()};!function(_0x8e6b40){const _0x3aee0f=_0x24c7b6,_0x20ed2b=activePatterns[_0x3aee0f('0x11')](_0x2d6f4c=>_0x2d6f4c['strategy']===_0x8e6b40['strategy']&&_0x2d6f4c['trigger']===_0x8e6b40['trigger']&&_0x2d6f4c['status']==='active'),_0x24c7b6=confirmedPatterns[_0x3aee0f('0x11')](_0x3aee0f=>_0x3aee0f['strategy']===_0x8e6b40['strategy']&&_0x3aee0f['trigger']===_0x8e6b40['trigger']);return _0x20ed2b||_0x24c7b6;}(_0x24c7b6)||(activePatterns['push'](_0x24c7b6),stats['patternsTriggered']++,console[_0x24c7b6('0x9')](`🎯 NOVO: ${_0x8e6b40} para T${_0x2d6f4c} | Cancelamento/Pagamento: ${_0x2d6f4c['length']} núm`));}('Alvo Central',`${_0x4c4a17} (T${_0x119fd3}), ${_0x564e79} (T${_0x3c5e8f})`,_0x1e23d4);}if([0xb,0x16,0x21][_0x3b9f8b('0x11')](_0x564e79)){!function(_0x1e23d4,_0x8e6b40,_0x3aee0f,_0x20ed2b){const _0x2d6f4c=_0x3b9f8b,_0x24c7b6=[];_0x3aee0f['forEach'](_0x8e6b40=>{const _0x3aee0f=getNeighborsInWheel(_0x8e6b40,0x2);_0x24c7b6[_0x2d6f4c('0x24')](..._0x3aee0f);});const _0x5e326f=[..._0x3aee0f,..._0x24c7b6];const _0x1e23d4=[..._0x3aee0f,..._0x24c7b6];const _0x8e6b40='Alvo Gêmeos'===_0x1e23d4?'Gêmeos (11, 22, 33)':'Triângulo (30, 31, 32)';const _0x3aee0f={id:generateId(),strategy:'Alvo Gêmeos'===_0x1e23d4?0x5:0x6,name:_0x1e23d4,trigger:_0x8e6b40,targetDisplay:`${_0x8e6b40} com 2V`,targetNumbers:_0x3aee0f,betNumbers:_0x1e23d4,cancellationSet:_0x5e326f,status:'active',confirmationCount:0x0,betSize:_0x1e23d4['length'],type:'specific',createdAt:Date['now']()};!function(_0x1e23d4){const _0x8e6b40=_0x2d6f4c,_0x3aee0f=activePatterns[_0x8e6b40('0x11')](_0x20ed2b=>_0x20ed2b['strategy']===_0x1e23d4['strategy']&&_0x20ed2b['trigger']===_0x1e23d4['trigger']&&_0x20ed2b['status']==='active'),_0x5e326f=confirmedPatterns['some'](_0x3aee0f=>_0x3aee0f['strategy']===_0x1e23d4['strategy']&&_0x3aee0f['trigger']===_0x1e23d4['trigger']);return _0x3aee0f||_0x5e326f;}(_0x3aee0f)||(activePatterns['push'](_0x3aee0f),stats['patternsTriggered']++,console[_0x2d6f4c('0x9')](`🎯 NOVO: ${_0x1e23d4} | Cancelamento/Pagamento: ${_0x5e326f['length']} núm`));}('Alvo Gêmeos',`${_0x564e79}`,[0xb,0x16,0x21],0x2);}if([0x1e,0x1f,0x20]['includes'](_0x564e79)){!function(_0x1e23d4,_0x8e6b40,_0x3aee0f,_0x20ed2b){const _0x2d6f4c=_0x3b9f8b,_0x24c7b6=[];_0x3aee0f[_0x2d6f4c('0x22')](_0x8e6b40=>{const _0x3aee0f=getNeighborsInWheel(_0x8e6b40,0x2);_0x24c7b6['push'](..._0x3aee0f);});const _0x5e326f=[..._0x3aee0f,..._0x24c7b6];const _0x1e23d4=[..._0x3aee0f,..._0x24c7b6];const _0x8e6b40='Alvo Gêmeos'===_0x1e23d4?'Gêmeos (11, 22, 33)':'Triângulo (30, 31, 32)';const _0x3aee0f={id:generateId(),strategy:'Alvo Gêmeos'===_0x1e23d4?0x5:0x6,name:_0x1e23d4,trigger:_0x8e6b40,targetDisplay:`${_0x8e6b40} com 2V`,targetNumbers:_0x3aee0f,betNumbers:_0x1e23d4,cancellationSet:_0x5e326f,status:'active',confirmationCount:0x0,betSize:_0x1e23d4['length'],type:'specific',createdAt:Date['now']()};!function(_0x1e23d4){const _0x8e6b40=_0x2d6f4c,_0x3aee0f=activePatterns[_0x8e6b40('0x11')](_0x20ed2b=>_0x20ed2b['strategy']===_0x1e23d4['strategy']&&_0x20ed2b['trigger']===_0x1e23d4['trigger']&&_0x20ed2b['status']==='active'),_0x5e326f=confirmedPatterns[_0x8e6b40('0x11')](_0x3aee0f=>_0x3aee0f['strategy']===_0x1e23d4['strategy']&&_0x3aee0f['trigger']===_0x1e23d4['trigger']);return _0x3aee0f||_0x5e326f;}(_0x3aee0f)||(activePatterns[_0x2d6f4c('0x24')](_0x3aee0f),stats['patternsTriggered']++,console['log'](`🎯 NOVO: ${_0x1e23d4} | Cancelamento/Pagamento: ${_0x5e326f['length']} núm`));}('Alvo Triângulo',`${_0x564e79}`,[0x1e,0x1f,0x20],0x2);}}(),function(){const _0x3b9f8b=_0x5e326f;confirmedPatterns['length']>0x1&&!multipleConfirmationsBlock&&(console[_0x3b9f8b('0x9')]("⚠️ MÚLTIPLOS CONFIRMADOS DETECTADOS!"),multipleConfirmationsBlock=!![]),confirmedPatterns['length']<=0x1&&multipleConfirmationsBlock&&(multipleConfirmationsBlock=![]);}();}function getNeighborsInWheel(_0x4b7b02,_0x21e8f0){const _0x2a4f35=wheelSequence[_0x2a4f('0x11')](_0x4b7b02);if(-0x1===_0x2a4f35)return[];const _0x5e326f=[];for(let _0x3d0e09=0x1;_0x3d0e09<=_0x21e8f0;_0x3d0e09++){const _0x12038f=(_0x2a4f35-_0x3d0e09+wheelSequence[_0x2a4f('0x1d')])%wheelSequence[_0x2a4f('0x1d')];_0x5e326f[_0x2a4f('0x24')](wheelSequence[_0x12038f]);const _0x3b9f8b=(_0x2a4f35+_0x3d0e09)%wheelSequence['length'];_0x5e326f[_0x2a4f('0x24')](wheelSequence[_0x3b9f8b]);}return _0x5e326f;}function getNumbersByTerminal(_0x4b7b02){return wheelSequence[_0x2a4f('0x21')](_0x21e8f0=>_0x21e8f0%0xa===_0x4b7b02);}function generateId(){const _0x21e8f0=_0x2a4f;return Date[_0x21e8f0('0x2a')]()[_0x21e8f0('0x2b')](0x24)+Math[_0x21e8f0('0x2c')]()[_0x21e8f0('0x2b')](0x2);}function getColorForNumber(_0x4b7b02){const _0x21e8f0=_0x2a4f;return 0x0===_0x4b7b02?'#2E8B57':redNumbers[_0x21e8f0('0x11')](_0x4b7b02)?'#DC143C':'#333';}function updateDisplay(){const _0x4b7b02=_0x2a4f,_0x21e8f0=document[_0x4b7b02('0x4')]('numbersHistory');_0x21e8f0['innerHTML']='';if(0x0===numbersHistory[_0x4b7b02('0x1d')])_0x21e8f0[_0x4b7b02('0x6')]='<div style="color: var(--text-dim); align-self: center; width: 100%; text-align: center;">Nenhum número adicionado ainda</div>';else{const _0x2a4f35=document[_0x4b7b02('0x4')]('numbersHistory');_0x2a4f35[_0x4b7b02('0x6')]='',numbersHistory[_0x4b7b02('0x1e')](-0x10)[_0x4b7b02('0x1f')]()[_0x4b7b02('0x22')]((_0x5e326f,_0x3d0e09)=>{const _0x12038f=_0x4b7b02,_0x3b9f8b=0x0===_0x3d0e09,_0x140659=document['createElement']('div');_0x140659[_0x12038f('0x16')]=`number-chip ${0x0===_0x5e326f?'zero':redNumbers[_0x12038f('0x11')](_0x5e326f)?'red':'black'} ${_0x3b9f8b?'latest':''}`,_0x140659['textContent']=_0x5e326f;const _0x564e79=numbersHistory[_0x12038f('0x1d')]-_0x3d0e09;_0x140659['title']=`Posição: ${_0x564e79}${_0x3b9f8b?' (Último)':''}`,_0x2a4f35[_0x12038f('0x18')](_0x140659);});}document['getElementById']('totalNumbers')['textContent']=stats['totalNumbers'],document[_0x4b7b02('0x4')]('activePatterns')['textContent']=activePatterns['length'],document[_0x4b7b02('0x4')]('confirmedPatterns')['textContent']=confirmedPatterns['length'],document['getElementById']('greenSignals')[_0x4b7b02('0x10')]=stats['greenSignals'],document['getElementById']('redSignals')[_0x4b7b02('0x10')]=stats['redSignals'];const _0x5e326f=document[_0x4b7b02('0x4')]('confirmedPatternsHighlight');_0x5e326f[_0x4b7b02('0x6')]='';if(confirmedPatterns[_0x4b7b02('0x1d')]>0x0)confirmedPatterns[_0x4b7b02('0x22')](_0x3d0e09=>{const _0x12038f=document[_0x4b7b02('0x17')]('div');_0x12038f['className']='panel confirmed-highlight';const _0x3b9f8b=_0x3d0e09['checkedNumbers']||0x0,_0x140659=function(_0x564e79){const _0x4c4a17=_0x4b7b02;let _0x119fd3=0x0;const _0x3c5e8f=parseInt(document[_0x4c4a17('0x4')]('percent147')?.['textContent']||'0'),_0x5e326f=parseInt(document['getElementById']('percent258')?.['textContent']||'0'),_0x1e23d4=parseInt(document['getElementById']('percent0369')?.['textContent']||'0'),_0x8e6b40=parseInt(document['getElementById']('percentCima10')?.['textContent']||'0'),_0x3aee0f=parseInt(document[_0x4c4a17('0x4')]('percentBaixo0')?.['textContent']||'0'),_0x20ed2b=parseInt(document[_0x4c4a17('0x4')]('percentLadoE')?.['textContent']||'0'),_0x2d6f4c=parseInt(document[_0x4c4a17('0x4')]('percentLadoD')?.['textContent']||'0');if(_0x564e79['type']==='terminal'&&_0x564e79['targetDisplay'][_0x4c4a17('0x11')]('T')){const _0x24c7b6=parseInt(_0x564e79['targetDisplay']['match'](/T(\d)/)?.[0x1]||0x0);let _0x3aee0f=0x0;if([0x1,0x4,0x7][_0x4c4a17('0x11')](_0x24c7b6))_0x3aee0f=_0x3c5e8f;else if([0x2,0x5,0x8][_0x4c4a17('0x11')](_0x24c7b6))_0x3aee0f=_0x5e326f;else if([0x0,0x3,0x6,0x9]['includes'](_0x24c7b6))_0x3aee0f=_0x1e23d4;let _0x20ed2b=_0x24c7b6<=0x5?_0x8e6b40:_0x3aee0f,_0x2d6f4c=_0x24c7b6<=0x5?_0x20ed2b:_0x2d6f4c;_0x119fd3=Math['round'](0.4*_0x3aee0f+0.3*_0x20ed2b+0.3*_0x2d6f4c);}else if(_0x564e79['name']==='Alvo Duplo'&&_0x564e79['targetNumbers']&&_0x564e79['targetNumbers'][0x0]){const _0x24c7b6=_0x564e79['targetNumbers'][0x0];let _0x3aee0f=0x0;if(GRUPO_147[_0x4c4a17('0x11')](_0x24c7b6))_0x3aee0f=_0x3c5e8f;else if(GRUPO_258[_0x4c4a17('0x11')](_0x24c7b6))_0x3aee0f=_0x5e326f;else if(GRUPO_0369[_0x4c4a17('0x11')](_0x24c7b6))_0x3aee0f=_0x1e23d4;let _0x20ed2b=CIMA_10['includes'](_0x24c7b6)?_0x8e6b40:_0x3aee0f,_0x2d6f4c=LADO_E[_0x4c4a17('0x11')](_0x24c7b6)?_0x20ed2b:_0x2d6f4c;const _0x4c4a17=numbersHistory['length'],_0x119fd3=numbersHistory[_0x4c4a17('0x21')](_0x3aee0f=>_0x3aee0f===_0x24c7b6)['length'],_0x3b9f8b=_0x4c4a17>0x0?Math['round'](0x64*_0x119fd3/_0x4c4a17):0x0;_0x119fd3=Math['round'](0.25*_0x3aee0f+0.25*_0x20ed2b+0.25*_0x2d6f4c+0.25*_0x3b9f8b);}else if(_0x564e79['name']==='Alvo Gêmeos'){const _0x24c7b6=Math[_0x4c4a17('0x14')](_0x3c5e8f,_0x5e326f,_0x1e23d4),_0x3aee0f=_0x8e6b40,_0x20ed2b=_0x20ed2b;let _0x2d6f4c=0x0;[0xb,0x16,0x21][_0x4c4a17('0x22')](_0x4c4a17=>{_0x2d6f4c+=numbersHistory[_0x4c4a17('0x21')](_0x3b9f8b=>_0x3b9f8b===_0x4c4a17)['length'];}) const _0x4c4a17=numbersHistory['length']>0x0?Math[_0x4c4a17('0x12')](0x64*_0x2d6f4c/numbersHistory['length']):0x0;_0x119fd3=Math['round'](0.3*_0x24c7b6+0.2*_0x3aee0f+0.3*_0x20ed2b+0.2*_0x4c4a17);}else if(_0x564e79['name']==='Alvo Triângulo'){const _0x24c7b6=Math['max'](_0x3c5e8f,_0x5e326f,_0x1e23d4),_0x3aee0f=Math['round']((2*_0x8e6b40+_0x3aee0f)/0x3),_0x20ed2b=Math['round']((2*_0x20ed2b+_0x2d6f4c)/0x3);let _0x2d6f4c=0x0;[0x1e,0x1f,0x20]['forEach'](_0x4c4a17=>{_0x2d6f4c+=numbersHistory[_0x4c4a17('0x21')](_0x3b9f8b=>_0x3b9f8b===_0x4c4a17)['length'];}) const _0x4c4a17=numbersHistory[_0x4c4a17('0x1d')]>0x0?Math['round'](0x64*_0x2d6f4c/numbersHistory[_0x4c4a17('0x1d')]):0x0;_0x119fd3=Math['round'](0.25*_0x24c7b6+0.25*_0x3aee0f+0.25*_0x20ed2b+0.25*_0x4c4a17);}return Math[_0x4c4a17('0x29')](_0x119fd3,0x64);}(_0x3d0e09),_0x4c4a17=getClassificacao(_0x140659);_0x12038f['innerHTML']=`
+                    <div class="panel-title">
+                        <i>🚨</i> SINAL CONFIRMADO - APOSTE AGORA!
+                    </div>
+                    <div class="pattern-header">
+                        <div class="pattern-title">${_0x3d0e09['name']}</div>
+                        <div class="pattern-status status-confirmed">CONFIRMADO</div>
+                    </div>
+                    <div class="pattern-details"><strong>Gatilho:</strong> ${_0x3d0e09['trigger']}</div>
+                    <div class="pattern-target">🎯 ${_0x3d0e09['targetDisplay']}</div>
+                    <div class="pattern-status ${_0x4c4a17['classe']}" style="margin: 10px 0; font-size: 1rem;">
+                        ${_0x4c4a17['texto']} ${_0x140659}%
+                    </div>
+                    <div class="pattern-details"><strong>Tamanho da aposta:</strong> ${_0x3d0e09['betSize']} números</div>
+                    <div class="pattern-details"><strong>Testes GREEN/RED:</strong> ${_0x3b9f8b}/3</div>
+                    <div class="pattern-details"><strong>Números para apostar:</strong></div>
+                    <div class="pattern-numbers">
+                        ${_0x3d0e09['betNumbers']['map'](_0x24c7b6=>{const _0x3aee0f=_0x3d0e09['targetNumbers']['includes'](_0x24c7b6),_0x20ed2b=_0x24c7b6===0x0?'zero':redNumbers['includes'](_0x24c7b6)?'red':'black';return`<div class="pattern-number ${_0x20ed2b} ${_0x3aee0f?'target':''}" style="background-color: ${getColorForNumber(_0x24c7b6)}">${_0x24c7b6}</div>`;})[_0x4b7b02('0x2d')]('')}
+                    </div>
+                `,_0x5e326f['appendChild'](_0x12038f);});const _0x3d0e09=document['getElementById']('activePatternsList');_0x3d0e09[_0x4b7b02('0x6')]='';const _0x12038f=activePatterns[_0x4b7b02('0x21')](_0x3b9f8b=>_0x3b9f8b['status']==='active');if(0x0===_0x12038f[_0x4b7b02('0x1d')])_0x3d0e09[_0x4b7b02('0x6')]='<div style="color: var(--text-dim); text-align: center; padding: 30px;">Nenhum padrão ativo no momento</div>';else _0x12038f[_0x4b7b02('0x22')](_0x3b9f8b=>{const _0x140659=document['createElement']('div');_0x140659[_0x4b7b02('0x16')]='pattern-card';const _0x564e79=function(_0x4c4a17){const _0x119fd3=_0x4b7b02;let _0x3c5e8f=0x0;const _0x5e326f=parseInt(document[_0x119fd3('0x4')]('percent147')?.['textContent']||'0'),_0x1e23d4=parseInt(document['getElementById']('percent258')?.['textContent']||'0'),_0x8e6b40=parseInt(document[_0x119fd3('0x4')]('percent0369')?.['textContent']||'0'),_0x3aee0f=parseInt(document['getElementById']('percentCima10')?.[_0x119fd3('0x10')]||'0'),_0x20ed2b=parseInt(document[_0x119fd3('0x4')]('percentBaixo0')?.['textContent']||'0'),_0x2d6f4c=parseInt(document['getElementById']('percentLadoE')?.[_0x119fd3('0x10')]||'0'),_0x24c7b6=parseInt(document[_0x119fd3('0x4')]('percentLadoD')?.[_0x119fd3('0x10')]||'0');if(_0x4c4a17['type']==='terminal'&&_0x4c4a17['targetDisplay'][_0x119fd3('0x11')]('T')){const _0x3aee0f=parseInt(_0x4c4a17['targetDisplay']['match'](/T(\d)/)?.[0x1]||0x0);let _0x20ed2b=0x0;if([0x1,0x4,0x7][_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x5e326f;else if([0x2,0x5,0x8][_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x1e23d4;else if([0x0,0x3,0x6,0x9][_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x8e6b40;let _0x2d6f4c=_0x3aee0f<=0x5?_0x3aee0f:_0x20ed2b,_0x24c7b6=_0x3aee0f<=0x5?_0x2d6f4c:_0x24c7b6;_0x3c5e8f=Math[_0x119fd3('0x12')](0.4*_0x20ed2b+0.3*_0x2d6f4c+0.3*_0x24c7b6);}else if(_0x4c4a17['name']==='Alvo Duplo'&&_0x4c4a17['targetNumbers']&&_0x4c4a17['targetNumbers'][0x0]){const _0x3aee0f=_0x4c4a17['targetNumbers'][0x0];let _0x20ed2b=0x0;if(GRUPO_147[_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x5e326f;else if(GRUPO_258[_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x1e23d4;else if(GRUPO_0369[_0x119fd3('0x11')](_0x3aee0f))_0x20ed2b=_0x8e6b40;let _0x2d6f4c=CIMA_10[_0x119fd3('0x11')](_0x3aee0f)?_0x3aee0f:_0x20ed2b,_0x24c7b6=LADO_E[_0x119fd3('0x11')](_0x3aee0f)?_0x2d6f4c:_0x24c7b6;const _0x119fd3=numbersHistory['length'],_0x3c5e8f=numbersHistory[_0x119fd3('0x21')](_0x3aee0f=>_0x3aee0f===_0x3aee0f)[_0x119fd3('0x1d')],_0x5e326f=_0x119fd3>0x0?Math['round'](0x64*_0x3c5e8f/_0x119fd3):0x0;_0x3c5e8f=Math['round'](0.25*_0x20ed2b+0.25*_0x2d6f4c+0.25*_0x24c7b6+0.25*_0x5e326f);}else if(_0x4c4a17['name']==='Alvo Gêmeos'){const _0x3aee0f=Math['max'](_0x5e326f,_0x1e23d4,_0x8e6b40),_0x20ed2b=_0x3aee0f,_0x2d6f4c=_0x2d6f4c;let _0x24c7b6=0x0;[0xb,0x16,0x21][_0x119fd3('0x22')](_0x119fd3=>{_0x24c7b6+=numbersHistory[_0x119fd3('0x21')](_0x3c5e8f=>_0x3c5e8f===_0x119fd3)['length'];}) const _0x119fd3=numbersHistory['length']>0x0?Math['round'](0x64*_0x24c7b6/numbersHistory[_0x119fd3('0x1d')]):0x0;_0x3c5e8f=Math[_0x119fd3('0x12')](0.3*_0x3aee0f+0.2*_0x20ed2b+0.3*_0x2d6f4c+0.2*_0x119fd3);}else if(_0x4c4a17['name']==='Alvo Triângulo'){const _0x3aee0f=Math['max'](_0x5e326f,_0x1e23d4,_0x8e6b40),_0x20ed2b=Math[_0x119fd3('0x12')]((2*_0x3aee0f+_0x20ed2b)/0x3),_0x2d6f4c=Math['round']((2*_0x2d6f4c+_0x24c7b6)/0x3);let _0x24c7b6=0x0;[0x1e,0x1f,0x20][_0x119fd3('0x22')](_0x119fd3=>{_0x24c7b6+=numbersHistory[_0x119fd3('0x21')](_0x3c5e8f=>_0x3c5e8f===_0x119fd3)[_0x119fd3('0x1d')];}) const _0x119fd3=numbersHistory[_0x119fd3('0x1d')]>0x0?Math['round'](0x64*_0x24c7b6/numbersHistory[_0x119fd3('0x1d')]):0x0;_0x3c5e8f=Math['round'](0.25*_0x3aee0f+0.25*_0x20ed2b+0.25*_0x2d6f4c+0.25*_0x119fd3);}return Math[_0x119fd3('0x29')](_0x3c5e8f,0x64);}(_0x3b9f8b),_0x4c4a17=getClassificacao(_0x564e79),_0x119fd3=getTestesNecessarios(_0x3b9f8b);_0x140659['innerHTML']=`
+                    <div class="pattern-header">
+                        <div class="pattern-title">${_0x3b9f8b['name']}</div>
+                        <div class="pattern-status status-active">Ativo</div>
+                    </div>
+                    <div class="pattern-details">Gatilho: ${_0x3b9f8b['trigger']}</div>
+                    <div class="pattern-target">🎯 ${_0x3b9f8b['targetDisplay']}</div>
+                    <div class="pattern-status ${_0x4c4a17['classe']}" style="margin: 10px 0;">
+                        ${_0x4c4a17['texto']} ${_0x564e79}%
+                    </div>
+                    <div class="pattern-details">Aguardando confirmação: ${_0x3b9f8b['confirmationCount']}/${_0x119fd3}</div>
+                `,_0x3d0e09['appendChild'](_0x140659);}),atualizarEstatisticas();}
     </script>
 </body>
 </html>
